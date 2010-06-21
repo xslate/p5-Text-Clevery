@@ -1,0 +1,8 @@
+#!include_default
+
+# skip dot files
+^\.
+
+# skip author's files
+\bauthor\b
+
