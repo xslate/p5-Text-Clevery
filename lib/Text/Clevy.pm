@@ -7,16 +7,34 @@ use warnings;
 our $VERSION = '0.01';
 
 use parent qw(Text::Xslate);
+use Text::Clevy::Env;
 
 sub options {
     my($self) = @_;
 
     my $opts = $self->SUPER::options;
 
+    $opts->{env}    = undef;
     $opts->{syntax} = 'Text::Clevy::Parser';
     # vars
     # funcs
     return $opts;
+}
+
+sub new {
+    my $self = shift()->SUPER::new(@_);
+
+    if(defined($self->{env})) {
+        $self->{_smarty_env}          = Text::Clevy::Env->new(psgi_env => $self->{env});
+        $self->{function}{__smarty__} = sub { $self->{_smarty_env} };
+    }
+    else {
+        $self->{function}{__smarty__} = sub {
+            $self->_error('$smarty variable requires PSGI env');
+        };
+    }
+
+    return $self;
 }
 
 1;

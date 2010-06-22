@@ -66,6 +66,23 @@ T
     ---
 X
 
+    [<<'T', {foobar => 1}, <<'X'],
+    ---
+{if $lang}
+    unlikely
+{elseif $foobar}
+    ok
+{else}
+    unlikely
+{/if}
+    ---
+T
+    ---
+
+    ok
+
+    ---
+X
 
 );
 

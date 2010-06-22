@@ -25,12 +25,28 @@ around trim_code => sub {
 sub init_symbols {
     my($parser) = @_;
 
-    $parser->symbol('if')     ->set_std(\&std_if);
-    $parser->symbol('else')->is_block_end(1);
+    $parser->init_basic_operators();
 
-    $parser->symbol('/')->is_block_end(1); # {/if}
+    $parser->symbol('if')    ->set_std(\&std_if);
+    $parser->symbol('elseif')->is_block_end(1);
+    $parser->symbol('else')  ->is_block_end(1);
+
+    $parser->symbol('/')     ->is_block_end(1); # {/if}
+
+    $parser->symbol('$smarty')->set_nud(\&nud_smarty);
 
     return;
+}
+
+sub nud_smarty {
+    my($parser, $symbol) = @_;
+
+    # $smarty -> __smarty__()
+    return $symbol->clone(
+        arity  => 'call',
+        first  => $symbol->clone(id => '__smarty__', arity => 'name'),
+        second => [],
+    );
 }
 
 sub std_if {
@@ -42,7 +58,22 @@ sub std_if {
     $if->second( $parser->statements() );
 
     my $t = $parser->token;
-    if($parser->token->id eq 'else') {
+
+    my $top_if = $if;
+
+    while($t->id eq 'elseif') {
+        $parser->reserve($t);
+        $parser->advance();
+
+        my $elsif = $t->clone(arity => "if");
+        $elsif->first(  $parser->expression(0) );
+        $elsif->second( $parser->statements() );
+        $if->third([$elsif]);
+        $if = $elsif;
+        $t  = $parser->token;
+    }
+
+    if($t->id eq 'else') {
         $parser->reserve($t);
         $parser->advance();
 
@@ -52,7 +83,7 @@ sub std_if {
     $parser->advance('/');
     $parser->advance('if');
 
-    return $if;
+    return $top_if;
 }
 
 no Any::Moose;
