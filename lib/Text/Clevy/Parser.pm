@@ -8,6 +8,8 @@ sub _build_line_start { undef  }
 sub _build_tag_start  { qr/\{/ }
 sub _build_tag_end    { qr/\}/ }
 
+#sub symbol_class() { 'Text::Clevy::Symbol' }
+
 around trim_code => sub {
     my($super, $parser, $code) = @_;
 
@@ -27,13 +29,17 @@ sub init_symbols {
 
     $parser->init_basic_operators();
 
+    $parser->symbol('(name)')->set_std(\&std_name);
+
+    $parser->symbol
+
+    $parser->symbol('$smarty')->set_nud(\&nud_smarty);
+
     $parser->symbol('if')    ->set_std(\&std_if);
     $parser->symbol('elseif')->is_block_end(1);
     $parser->symbol('else')  ->is_block_end(1);
 
     $parser->symbol('/')     ->is_block_end(1); # {/if}
-
-    $parser->symbol('$smarty')->set_nud(\&nud_smarty);
 
     return;
 }
@@ -48,6 +54,48 @@ sub nud_smarty {
         second => [],
     );
 }
+
+sub attr_list {
+    my($parser) = @_;
+    my @args;
+    while(1) {
+        my $key = $parser->token;
+
+        if($key->arity ne "name") {
+            last;
+        }
+        $parser->advance();
+        $parser->advance("=");
+
+        my $value = $parser->expression(0);
+
+        push @args, $key->clone(arity => 'literal') => $value;
+    }
+    return \@args;
+}
+
+sub std_name {
+    my($parser, $symbol) = @_;
+
+    my $args = $parser->attr_list();
+
+    return $symbol->clone(
+        arity  => 'call',
+        first  => $symbol,
+        second => $args,
+    );
+}
+
+sub define_function {
+    my($parser, @names) = @_;
+
+    foreach my $name(@names) {
+        my $s = $parser->symbol($name);
+        $s->set_std(\&std_name);
+    }
+    return;
+}
+
 
 sub std_if {
     my($parser, $symbol) = @_;

@@ -7,14 +7,20 @@ use warnings;
 our $VERSION = '0.01';
 
 use parent qw(Text::Xslate);
+use Text::Xslate::Util qw(p literal_to_value);
 use Text::Clevy::Env;
+use Config::Tiny;
+
+my %builtin = (
+    config_load => \&_f_config_load,
+);
 
 sub options {
     my($self) = @_;
 
     my $opts = $self->SUPER::options;
 
-    $opts->{env}    = undef;
+    $opts->{env}    = {};
     $opts->{syntax} = 'Text::Clevy::Parser';
     # vars
     # funcs
@@ -24,17 +30,34 @@ sub options {
 sub new {
     my $self = shift()->SUPER::new(@_);
 
-    if(defined($self->{env})) {
-        $self->{_smarty_env}          = Text::Clevy::Env->new(psgi_env => $self->{env});
-        $self->{function}{__smarty__} = sub { $self->{_smarty_env} };
-    }
-    else {
-        $self->{function}{__smarty__} = sub {
-            $self->_error('$smarty variable requires PSGI env');
-        };
+    $self->{_smarty_env}          = Text::Clevy::Env->new(psgi_env => $self->{env});
+    $self->{function}{__smarty__} = sub { $self->{_smarty_env} };
+
+    while(my($name, $body) = each %builtin) {
+        $self->{function}{$name} = sub { unshift @_, $self; goto &{$body} };
     }
 
     return $self;
+}
+
+sub _f_config_load {
+    my($self, %args) = @_;
+
+    my $c = Config::Tiny->read($args{file})
+        || Carp::croak(Config::Tiny->errstr);
+
+    my $config   = $self->{_smarty_env}->config;
+
+    while(my($section_name, $section_config) = each %{$c}) {
+        my $storage = $section_name eq '_'
+            ?  $config
+            : ($config->{$section_name} ||= {});
+
+        while(my($key, $literal) = each %{$section_config}) {
+            $storage->{$key} = literal_to_value($literal);
+        }
+    }
+    return;
 }
 
 1;

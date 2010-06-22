@@ -4,6 +4,7 @@ use strict;
 use Test::More;
 
 use Text::Clevy;
+use Text::Clevy::Parser;
 
 my $tc = Text::Clevy->new();
 
@@ -82,6 +83,14 @@ T
     ok
 
     ---
+X
+
+    [<<'T', {foobar => 1}, <<'X'],
+{config_load file="t/conf/test.ini"}
+<h2 style="color:{$smarty.config.titleColor}">{#pageTitle#}</h1>
+T
+
+<h2 style="color:black">This is mine</h1>
 X
 
 );

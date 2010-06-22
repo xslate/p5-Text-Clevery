@@ -130,4 +130,4 @@ sub _build_hashref {
     return {};
 }
 no Any::Moose;
-1;
+__PACKAGE__->meta->make_immutable();
