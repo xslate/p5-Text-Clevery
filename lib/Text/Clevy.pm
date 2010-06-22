@@ -32,8 +32,6 @@ sub options {
 
     $opts->{env}    = {};
     $opts->{syntax} = 'Text::Clevy::Parser';
-    # vars
-    # funcs
     return $opts;
 }
 
