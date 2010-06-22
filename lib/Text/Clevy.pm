@@ -7,19 +7,23 @@ use warnings;
 our $VERSION = '0.01';
 
 use parent qw(Text::Xslate);
-use Text::Xslate::Util qw(p literal_to_value);
+
+use Carp ();
+
+use Text::Xslate::Util qw(p);
 use Text::Clevy::Env;
-use Config::Tiny;
+use Text::Clevy::Function;
+use Text::Clevy::Modifier;
 
-my %builtin = (
-    # functions
-    config_load => \&_f_config_load,
-
-    # modifiers
-    cat              => \&_m_cat,
-    capitalize       => \&_m_capitalize,
-    count_characters => \&_m_count_characters,
-);
+# for plugins
+our $_self;
+sub get_engine {
+    return +($_self || Carp::confess('Cannot call get_engine() outside render()'));
+}
+sub get_env {
+    return +($_self || Carp::confess('Cannot call get_engine() outside render()'))
+        ->{_smarty_env };
+}
 
 sub options {
     my($self) = @_;
@@ -39,56 +43,24 @@ sub new {
     $self->{_smarty_env}          = Text::Clevy::Env->new(psgi_env => $self->{env});
     $self->{function}{__smarty__} = sub { $self->{_smarty_env} };
 
-    while(my($name, $body) = each %builtin) {
-        $self->{function}{$name} = sub { unshift @_, $self; goto &{$body} };
-    }
+    $self->register_function( Text::Clevy::Function->get_table() );
+    $self->register_function( Text::Clevy::Modifier->get_table() );
 
     return $self;
 }
 
-sub _f_config_load {
-    my($self, %args) = @_;
+sub register_function {
+    my $self = shift;
 
-    my $c = Config::Tiny->read($args{file})
-        || Carp::croak(Config::Tiny->errstr);
-
-    my $config   = $self->{_smarty_env}->config;
-
-    while(my($section_name, $section_config) = each %{$c}) {
-        my $storage = $section_name eq '_'
-            ?  $config
-            : ($config->{$section_name} ||= {});
-
-        while(my($key, $literal) = each %{$section_config}) {
-            $storage->{$key} = literal_to_value($literal);
-        }
+    my $function = $self->{function};
+    while(my($name, $body) = splice @_, 0, 2) {
+        $function->{$name} = sub {
+            local $_self = $self;
+            &{$body}; # XXX: Cannot use goto &{$body}
+        };
     }
     return;
 }
-
-sub _m_capitalize {
-    my($self, $str, $number_as_word) = @_;
-    my $word = $number_as_word
-        ? qr/\b ([[:alpha:]]\w*) \b/xms
-        : qr/\b ([[:alpha:]]+)   \b/xms;
-
-    $str =~ s/$word/ ucfirst($1) /xmseg;
-    return $str;
-}
-
-sub _m_cat {
-    my($self, @args) = @_;
-    return join q{}, @args;
-}
-
-sub _m_count_characters {
-    my($self, $str, $count_whitespaces) = @_;
-    if(!$count_whitespaces) {
-        $str =~ s/\s+//g;
-    }
-    return length($str);
-}
-
 
 1;
 __END__
