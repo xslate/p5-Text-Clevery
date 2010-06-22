@@ -43,3 +43,4 @@
 
 # compiled template files
 \.tplc$
+\bSmarty[23]\b

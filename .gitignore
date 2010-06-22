@@ -22,3 +22,5 @@ cover_db*
 *.gcov
 *.stackdump
 *.tplc
+Smarty2/
+Smarty3/
