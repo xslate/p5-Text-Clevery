@@ -11,7 +11,7 @@ our $EngineClass = 'Text::Clevy';
 
 # {capture}, {foreach}, {literal}, {section}, {strip}
 # are defined as block statements
-my @functions = map { $_ => __PACKAGE__->can($_) } qw(
+my @functions = map { $_ => __PACKAGE__->can($_) || _not_impl($_) } qw(
     config_load
     include
     include_php
@@ -39,13 +39,18 @@ my @functions = map { $_ => __PACKAGE__->can($_) } qw(
 
 sub get_table { @functions }
 
+sub _not_impl {
+    my($name) = @_;
+    return sub { die "Function $name is not implemented.\n" };
+}
+
 sub config_load {
     my(%args) = @_;
 
     my $c = Config::Tiny->read($args{file})
         || Carp::croak(Config::Tiny->errstr);
 
-    my $config   = $EngineClass->get_env->config;
+    my $config = $EngineClass->get_env->config;
 
     while(my($section_name, $section_config) = each %{$c}) {
         my $storage = $section_name eq '_'

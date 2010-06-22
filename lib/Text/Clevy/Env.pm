@@ -6,7 +6,7 @@ has psgi_env => (
     is  => 'ro',
     isa => 'HashRef',
 
-    required => 1,
+    default => \&_build_hashref,
 );
 
 has request => (

@@ -15,22 +15,11 @@ use Text::Clevy::Env;
 use Text::Clevy::Function;
 use Text::Clevy::Modifier;
 
-# for plugins
-our $_self;
-sub get_engine {
-    return +($_self || Carp::confess('Cannot call get_engine() outside render()'));
-}
-sub get_env {
-    return +($_self || Carp::confess('Cannot call get_engine() outside render()'))
-        ->{_smarty_env };
-}
-
 sub options {
     my($self) = @_;
 
     my $opts = $self->SUPER::options;
 
-    $opts->{env}    = {};
     $opts->{syntax} = 'Text::Clevy::Parser';
     return $opts;
 }
@@ -38,32 +27,24 @@ sub options {
 sub new {
     my $self = shift()->SUPER::new(@_);
 
-    $self->{_smarty_env}          = Text::Clevy::Env->new(psgi_env => $self->{env});
-    $self->{function}{__smarty__} = sub { $self->{_smarty_env} };
-
+    $self->register_function( __smarty__ => sub { $self->{_smarty_env} } );
     $self->register_function( Text::Clevy::Function->get_table() );
     $self->register_function( Text::Clevy::Modifier->get_table() );
 
     return $self;
 }
 
-sub register_function {
-    my $self = shift;
+sub set_psgi_env {
+    my($self, $env) = @_;
 
-    my $function = $self->{function};
-    while(my($name, $body) = splice @_, 0, 2) {
-        if(!defined $body) { # TODO: remove this in the future release
-            $function->{$name} = sub {
-                die "$name is not implemented.\n";
-            };
-            next;
-        }
-        $function->{$name} = sub {
-            local $_self = $self;
-            &{$body}; # XXX: Cannot use goto &{$body}
-        };
-    }
-    return;
+    $self->{_smarty_env} = Text::Clevy::Env->new( psgi_env => $env );
+    return $self;
+}
+
+sub get_env { # for plugins
+    my $engine = __PACKAGE__->engine
+        or return undef;
+    return $engine->{_smarty_env} ||= Text::Clevy::Env->new();
 }
 
 1;
