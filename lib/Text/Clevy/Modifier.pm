@@ -2,15 +2,35 @@ package Text::Clevy::Modifier;
 use strict;
 use warnings;
 
-use Text::Xslate::Util qw(p);
+use Time::Piece ();
+
+use Text::Xslate::Util qw(p html_escape mark_raw);
 
 require Text::Clevy;
 our $EngineClass = 'Text::Clevy';
 
-my @modifiers = (
-    capitalize       => \&capitalize,
-    cat              => \&cat,
-    count_characters => \&count_characters,
+my @modifiers = map { $_ => __PACKAGE__->can($_) } qw(
+    capitalize
+    cat
+    count_characters
+    count_paragraphs
+    count_sentences
+    count_words
+    date_format
+    default
+    escape
+    indent
+    lower
+    nl2br
+    regex_replace
+    replace
+    spacify
+    string_format
+    strip
+    strip_tags
+    truncate
+    upper
+    wordwrap
 );
 
 sub get_table { @modifiers }
@@ -37,5 +57,60 @@ sub count_characters {
     }
     return length($str);
 }
+
+#sub count_paragraphs
+#sub count_sentences
+#sub count_words
+
+sub date_format {
+    my($time, $format, $default) = @_;
+    return $time
+        ? Time::Piece->new($time)->strftime($format)
+        : $default;
+}
+
+sub default {
+    my($value, $default) = @_;
+    return defined($value) && length($value)
+        ? $value
+        : $default;
+}
+
+#sub escape
+#sub indent
+
+sub lower {
+    my($str) = @_;
+    return lc($str);
+}
+
+sub nl2br {
+    my($str) = @_;
+    return mark_raw(
+        join "<br />",
+            map { html_escape($_)->as_string() }
+                split /\n/, $str, -1
+    );
+}
+
+#sub regex_replace
+#sub replace
+#sub spacify
+
+sub string_format {
+    my($str, $format) = @_;
+    return sprintf $format, $str;
+}
+
+#sub strip
+#sub strip_tags
+#sub truncate
+
+sub upper {
+    my($str) = @_;
+    return uc($str);
+}
+
+#sub wordwrap
 
 1;

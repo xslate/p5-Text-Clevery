@@ -5,6 +5,9 @@ use Test::More;
 
 use Text::Clevy;
 use Text::Clevy::Parser;
+use Time::Piece qw(localtime);
+
+my $now = time();
 
 my $tc = Text::Clevy->new();
 
@@ -115,6 +118,50 @@ X
 T
     29
     33
+X
+
+    [<<'T', {now => $now}, sprintf <<'X', localtime($now)->year],
+    {$now|date_format:"[%Y]"}
+T
+    [%s]
+X
+
+    [<<'T', {a => undef, b => "", c => "0"}, <<'X'],
+    {$a|default: "aaa"}
+    {$b|default: "bbb"}
+    {$c|default: "ccc"}
+T
+    aaa
+    bbb
+    0
+X
+
+    [<<'T', {a => "foo", b => "FOO" }, <<'X'],
+    {$a|lower}
+    {$b|lower}
+T
+    foo
+    foo
+X
+
+    [<<'T', {value => "foo\n" . "bar\n"}, <<'X'],
+{$value|nl2br}
+T
+foo<br />bar<br />
+X
+
+    [<<'T', {value => 3.14}, <<'X'],
+    {$value|string_format: '[%d]'}
+T
+    [3]
+X
+
+    [<<'T', {a => "foo", b => "FOO" }, <<'X'],
+    {$a|upper}
+    {$b|upper}
+T
+    FOO
+    FOO
 X
 );
 

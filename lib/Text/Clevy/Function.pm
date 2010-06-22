@@ -9,8 +9,32 @@ use Text::Xslate::Util qw(p literal_to_value);
 require Text::Clevy;
 our $EngineClass = 'Text::Clevy';
 
-my @functions = (
-    config_load => \&config_load,
+# {capture}, {foreach}, {literal}, {section}, {strip}
+# are defined as block statements
+my @functions = map { $_ => __PACKAGE__->can($_) } qw(
+    config_load
+    include
+    include_php
+    insert
+
+    assign
+    counter
+    cycle
+    debug
+    eval
+    fetch
+    html_checkboxes
+    html_image
+    html_options
+    html_radios
+    html_select_date
+    html_select_time
+    html_table
+    mailto
+    math
+    popup
+    pupup_init
+    textformat
 );
 
 sub get_table { @functions }

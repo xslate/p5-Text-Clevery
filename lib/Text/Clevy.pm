@@ -52,6 +52,12 @@ sub register_function {
 
     my $function = $self->{function};
     while(my($name, $body) = splice @_, 0, 2) {
+        if(!defined $body) { # TODO: remove this in the future release
+            $function->{$name} = sub {
+                die "$name is not implemented.\n";
+            };
+            next;
+        }
         $function->{$name} = sub {
             local $_self = $self;
             &{$body}; # XXX: Cannot use goto &{$body}
