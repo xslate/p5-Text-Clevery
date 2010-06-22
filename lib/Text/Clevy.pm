@@ -27,9 +27,11 @@ sub options {
 sub new {
     my $self = shift()->SUPER::new(@_);
 
-    $self->register_function( __smarty__ => sub { $self->get_env() } );
-    $self->register_function( Text::Clevy::Function->get_table() );
-    $self->register_function( Text::Clevy::Modifier->get_table() );
+    $self->register_function(
+        __smarty__ => \&get_env,
+        Text::Clevy::Function->get_table(),
+        Text::Clevy::Modifier->get_table(),
+    );
 
     return $self;
 }
