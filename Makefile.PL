@@ -4,9 +4,10 @@ use inc::Module::Install;
 
 all_from 'lib/Text/Clevy.pm';
 
-requires 'Text::Xslate' => 0.1034;
-requires 'Any::Moose'   => 0.13;
-requires 'Config::Tiny' => 2.12;
+requires 'Any::Moose'     => 0.13;
+requires 'Text::Xslate'   => 0.1035;
+requires 'Config::Tiny'   => 2.12;
+requires 'Plack'          => 0.9938;
 
 test_requires 'Test::More' => 0.88; # done_testing()
 
