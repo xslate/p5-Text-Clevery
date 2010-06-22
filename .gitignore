@@ -21,3 +21,4 @@ cover_db*
 *.gno
 *.gcov
 *.stackdump
+*.tplc
