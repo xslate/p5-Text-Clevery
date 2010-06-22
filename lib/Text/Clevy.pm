@@ -56,9 +56,11 @@ This document describes Text::Clevy version 0.01.
 
     my $tc = Text::Clevy->new();
 
-    print $tc->render_str('Hello, {$lang} world!', {
+    my %vars = (
         lang => 'Smarty',
-    });
+    );
+    my $psgi_env = {};
+    print $tc->render_string('Hello, {$lang} world!', \%vars, env => $psgi_env);
 
 =head1 DESCRIPTION
 
