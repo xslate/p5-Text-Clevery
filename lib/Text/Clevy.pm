@@ -12,7 +12,12 @@ use Text::Clevy::Env;
 use Config::Tiny;
 
 my %builtin = (
+    # functions
     config_load => \&_f_config_load,
+
+    # modifiers
+    cat         => \&_m_cat,
+    capitalize  => \&_m_capitalize,
 );
 
 sub options {
@@ -58,6 +63,22 @@ sub _f_config_load {
         }
     }
     return;
+}
+
+sub _m_capitalize {
+    my($self, $str, $number_as_word) = @_;
+
+    my $word = $number_as_word
+        ? qr/\b ([[:alpha:]]\w*) \b/xms
+        : qr/\b ([[:alpha:]]+)   \b/xms;
+
+    $str =~ s/$word/ ucfirst($1) /xmseg;
+    return $str;
+}
+
+sub _m_cat {
+    my($self, @args) = @_;
+    return join q{}, @args;
 }
 
 1;

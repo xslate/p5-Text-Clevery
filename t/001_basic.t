@@ -93,6 +93,20 @@ T
 <h2 style="color:black">This is mine</h1>
 X
 
+    [<<'T', {value => "next x-men film, x3, delayed."}, <<'X'],
+<em>{$value|capitalize}</em>
+<em>{$value|capitalize:true}</em>
+T
+<em>Next X-Men Film, x3, Delayed.</em>
+<em>Next X-Men Film, X3, Delayed.</em>
+X
+
+    [<<'T', {value => "foo"}, <<'X'],
+<em>{$value|cat:"bar"}</em>
+T
+<em>foobar</em>
+X
+
 );
 
 for my $d(@set) {

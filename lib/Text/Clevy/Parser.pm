@@ -8,8 +8,6 @@ sub _build_line_start { undef  }
 sub _build_tag_start  { qr/\{/ }
 sub _build_tag_end    { qr/\}/ }
 
-#sub symbol_class() { 'Text::Clevy::Symbol' }
-
 around trim_code => sub {
     my($super, $parser, $code) = @_;
 
@@ -31,7 +29,7 @@ sub init_symbols {
 
     $parser->symbol('(name)')->set_std(\&std_name);
 
-    $parser->symbol
+    $parser->symbol('|')     ->set_led(\&led_bar);
 
     $parser->symbol('$smarty')->set_nud(\&nud_smarty);
 
@@ -53,6 +51,23 @@ sub nud_smarty {
         first  => $symbol->clone(id => '__smarty__', arity => 'name'),
         second => [],
     );
+}
+
+# variable modifiers
+# expr | modifier : param1 : param2 ...
+sub led_bar {
+    my($parser, $symbol, $left) = @_;
+
+    my $bar = $parser->SUPER::led_bar($symbol, $left);
+
+    my @args;
+    while($parser->token->id eq ':') {
+        $parser->advance();
+        my $modifier = $parser->expression(0);
+        push @args, $modifier;
+    }
+    push @{$bar->second}, @args;
+    return $bar;
 }
 
 sub attr_list {
