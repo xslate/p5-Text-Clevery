@@ -18,7 +18,6 @@ my %env = (
     SERVER_NAME  => 'my.host',
 );
 my $tc = Text::Clevy->new();
-$tc->set_psgi_env(\%env);
 
 $ENV{CLEVY_TESTING} = 'Smarty';
 
@@ -59,12 +58,21 @@ T
 Hello, %s world!
 X
 
+
+    [<<'T', {foobar => 1}, <<'X'],
+{config_load file="t/conf/test.ini"}
+<h2 style="color:{$smarty.config.titleColor}">{#pageTitle#}</h1>
+T
+
+<h2 style="color:black">This is mine</h1>
+X
+
 );
 
 for my $d(@set) {
     my($source, $vars, $expected, $msg) = @{$d};
 
-    is eval { $tc->render_string($source, $vars) }, $expected, $msg
+    is eval { $tc->render_string($source, $vars, env => \%env) }, $expected, $msg
         or do { ($@ && diag $@); diag $source };
 }
 

@@ -88,14 +88,6 @@ T
     ---
 X
 
-    [<<'T', {foobar => 1}, <<'X'],
-{config_load file="t/conf/test.ini"}
-<h2 style="color:{$smarty.config.titleColor}">{#pageTitle#}</h1>
-T
-
-<h2 style="color:black">This is mine</h1>
-X
-
     [<<'T', {value => "next x-men film, x3, delayed."}, <<'X'],
 <em>{$value|capitalize}</em>
 <em>{$value|capitalize:false}</em>

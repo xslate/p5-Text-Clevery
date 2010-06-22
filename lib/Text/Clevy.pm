@@ -27,24 +27,16 @@ sub options {
 sub new {
     my $self = shift()->SUPER::new(@_);
 
-    $self->register_function( __smarty__ => sub { $self->{_smarty_env} } );
+    $self->register_function( __smarty__ => sub { $self->get_env() } );
     $self->register_function( Text::Clevy::Function->get_table() );
     $self->register_function( Text::Clevy::Modifier->get_table() );
 
     return $self;
 }
 
-sub set_psgi_env {
-    my($self, $env) = @_;
-
-    $self->{_smarty_env} = Text::Clevy::Env->new( psgi_env => $env );
-    return $self;
-}
-
 sub get_env { # for plugins
-    my $engine = __PACKAGE__->engine
-        or return undef;
-    return $engine->{_smarty_env} ||= Text::Clevy::Env->new();
+    my $args = __PACKAGE__->render_args() or die "No PSGI env given.\n";
+    return $args->{_clevy_env} ||= Text::Clevy::Env->new(psgi_env => $args->{env} || {});
 }
 
 1;
