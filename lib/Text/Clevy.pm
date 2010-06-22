@@ -124,7 +124,7 @@ to cpan-RT.
 
 L<Text::Xslate>
 
-L<http://smarty.php.net/>
+L<http://www.smarty.net/>
 
 =head1 AUTHOR
 
