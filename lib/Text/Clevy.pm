@@ -16,8 +16,9 @@ my %builtin = (
     config_load => \&_f_config_load,
 
     # modifiers
-    cat         => \&_m_cat,
-    capitalize  => \&_m_capitalize,
+    cat              => \&_m_cat,
+    capitalize       => \&_m_capitalize,
+    count_characters => \&_m_count_characters,
 );
 
 sub options {
@@ -67,7 +68,6 @@ sub _f_config_load {
 
 sub _m_capitalize {
     my($self, $str, $number_as_word) = @_;
-
     my $word = $number_as_word
         ? qr/\b ([[:alpha:]]\w*) \b/xms
         : qr/\b ([[:alpha:]]+)   \b/xms;
@@ -80,6 +80,15 @@ sub _m_cat {
     my($self, @args) = @_;
     return join q{}, @args;
 }
+
+sub _m_count_characters {
+    my($self, $str, $count_whitespaces) = @_;
+    if(!$count_whitespaces) {
+        $str =~ s/\s+//g;
+    }
+    return length($str);
+}
+
 
 1;
 __END__

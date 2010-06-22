@@ -95,8 +95,10 @@ X
 
     [<<'T', {value => "next x-men film, x3, delayed."}, <<'X'],
 <em>{$value|capitalize}</em>
+<em>{$value|capitalize:false}</em>
 <em>{$value|capitalize:true}</em>
 T
+<em>Next X-Men Film, x3, Delayed.</em>
 <em>Next X-Men Film, x3, Delayed.</em>
 <em>Next X-Men Film, X3, Delayed.</em>
 X
@@ -107,6 +109,13 @@ T
 <em>foobar</em>
 X
 
+    [<<'T', {value => "Cold Wave Linked to Temperatures."}, <<'X'],
+    {$value|count_characters}
+    {$value|count_characters:true}
+T
+    29
+    33
+X
 );
 
 for my $d(@set) {
