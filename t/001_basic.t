@@ -155,6 +155,45 @@ T
     FOO
     FOO
 X
+
+    [<<'T', {a => "foo"}, <<'X'],
+{if $a -}
+    [{$a|upper}]
+{/if -}
+T
+    [FOO]
+X
+
+    [<<'T', { a => [qw(foo bar baz)] }, <<'X'],
+{foreach from=$a item=it -}
+    [{$it}]
+{/foreach -}
+T
+    [foo]
+    [bar]
+    [baz]
+X
+
+    [<<'T', { value => 'foo' }, <<'X'],
+{literal}[{$value}]{/literal}
+T
+[{$value}]
+X
+
+    [<<'T', { a => [] }, <<'X'],
+{literal}
+{foreach from=$a item=it -}
+    [{$it}]
+{/foreach -}
+{/literal}
+T
+
+{foreach from=$a item=it -}
+    [{$it}]
+{/foreach -}
+
+X
+
 );
 
 for my $d(@set) {

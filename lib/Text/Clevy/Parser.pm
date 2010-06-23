@@ -5,8 +5,8 @@ extends 'Text::Xslate::Parser';
 use Text::Xslate::Util qw(p any_in);
 
 sub _build_line_start { undef  }
-sub _build_tag_start  { qr/\{/ }
-sub _build_tag_end    { qr/\}/ }
+sub _build_tag_start  { '{' }
+sub _build_tag_end    { '}' }
 
 around trim_code => sub {
     my($super, $parser, $code) = @_;
@@ -21,6 +21,42 @@ around trim_code => sub {
     return $super->($parser, $code);
 };
 
+around split => sub {
+    my($super, $parser, @args) = @_;
+
+
+    my $tokens_ref = $super->($parser, @args);
+    for(my $i = 0; $i < @{$tokens_ref}; $i++) {
+        my $t = $tokens_ref->[$i];
+        if($t->[0] eq 'code' && $t->[1] =~ m{\A \s* literal \s* \z}xms) {
+            my $text = '';
+
+            for(my $j = $i + 1; $j < @{$tokens_ref}; $j++) {
+                my $u = $tokens_ref->[$j];
+                if($u->[0] eq 'code' && $u->[1] =~ m{\A \s* /literal \s* \z}xms) {
+                    splice @{$tokens_ref}, $i+1, $j - $i;
+                    last;
+                }
+                elsif( $u->[0] eq 'code' ) {
+                    $text .= $parser->tag_start . $u->[1];
+
+                    my $n = $tokens_ref->[$j+1];
+                    if($n && $n->[0] eq 'postchomp') {
+                        $text .= $n->[1];
+                        $j++;
+                    }
+                    $text .= $parser->tag_end;
+                }
+                else {
+                    $text .= $u->[1];
+                }
+            }
+            $t->[0] = 'text';
+            $t->[1] = $text;
+        }
+    }
+    return $tokens_ref;
+};
 
 sub init_symbols {
     my($parser) = @_;
@@ -37,6 +73,8 @@ sub init_symbols {
     $parser->symbol('if')    ->set_std(\&std_if);
     $parser->symbol('elseif')->is_block_end(1);
     $parser->symbol('else')  ->is_block_end(1);
+
+    $parser->symbol('foreach')->set_std(\&std_foreach);
 
     $parser->symbol('/')     ->is_block_end(1); # {/if}
 
@@ -83,10 +121,18 @@ sub attr_list {
         $parser->advance();
         $parser->advance("=");
 
-        my $value = $parser->expression(0);
+        my $value;
+        if($parser->token->arity eq "name") {
+            $value = $parser->token->clone(arity => 'literal');
+            $parser->advance();
+        }
+        else {
+            $value = $parser->expression(0);
+        }
 
         push @args, $key->clone(arity => 'literal') => $value;
     }
+
     return \@args;
 }
 
@@ -148,6 +194,30 @@ sub std_if {
     $parser->advance('if');
 
     return $top_if;
+}
+
+sub std_foreach {
+    my($parser, $symbol) = @_;
+
+    my $for = $symbol->clone( arity => 'for' );
+
+    my %args = @{ $parser->attr_list() };
+
+    my $from = $args{from} or $parser->_error("You must specify 'from' for {foreach}");
+    my $item = $args{item} or $parser->_error("You must specify 'item' for {foreach}");
+    #my $key  = $args{key};
+    #my $name = $args{name};
+
+    $item->id( '$' . $item->id );
+
+    $for->first($from);
+    $for->second([$item]);
+    $for->third( $parser->statements() );
+
+    $parser->advance('/');
+    $parser->advance('foreach');
+
+    return $for;
 }
 
 no Any::Moose;
