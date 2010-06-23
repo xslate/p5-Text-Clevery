@@ -15,7 +15,7 @@ around trim_code => sub {
         return '';
     }
     elsif($code =~ /\A \# (.*) \# \z/xms) { # config
-        return sprintf '$smarty.config.%s', $1;
+        return sprintf '$clevy.config.%s', $1;
     }
 
     return $super->($parser, $code);
@@ -31,7 +31,8 @@ sub init_symbols {
 
     $parser->symbol('|')     ->set_led(\&led_bar);
 
-    $parser->symbol('$smarty')->set_nud(\&nud_smarty);
+    $parser->symbol('$clevy') ->set_nud(\&nud_clevy_context);
+    $parser->symbol('$smarty')->set_nud(\&nud_clevy_context);
 
     $parser->symbol('if')    ->set_std(\&std_if);
     $parser->symbol('elseif')->is_block_end(1);
@@ -42,13 +43,13 @@ sub init_symbols {
     return;
 }
 
-sub nud_smarty {
+sub nud_clevy_context {
     my($parser, $symbol) = @_;
 
-    # $smarty -> __smarty__()
+    # $clevy -> __clevy__()
     return $symbol->clone(
         arity  => 'call',
-        first  => $symbol->clone(id => '__smarty__', arity => 'name'),
+        first  => $symbol->clone(id => '__clevy__', arity => 'name'),
         second => [],
     );
 }

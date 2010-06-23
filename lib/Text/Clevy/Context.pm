@@ -1,12 +1,15 @@
-package Text::Clevy::Env;
+package Text::Clevy::Context;
 use Any::Moose;
 use Plack::Request;
+
+my $smarty_compat_version = '2.6';
 
 has psgi_env => (
     is  => 'ro',
     isa => 'HashRef',
 
-    required => 1,
+    init_arg => 'env',
+    default  => \&_build_hashref,
 );
 
 has request => (
@@ -118,13 +121,9 @@ sub env { \%ENV }
 
 sub server { shift()->psgi_env }
 
-sub version { 2.6 } # Smarty compatible version
+sub version { $smarty_compat_version }
 
-sub now {
-    my($self) = @_;
-
-    return time();
-}
+sub now { time }
 
 sub _build_hashref {
     return {};

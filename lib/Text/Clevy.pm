@@ -11,7 +11,7 @@ use parent qw(Text::Xslate);
 use Carp ();
 
 use Text::Xslate::Util qw(p);
-use Text::Clevy::Env;
+use Text::Clevy::Context;
 use Text::Clevy::Function;
 use Text::Clevy::Modifier;
 
@@ -28,7 +28,7 @@ sub new {
     my $self = shift()->SUPER::new(@_);
 
     $self->register_function(
-        __smarty__ => \&get_env,
+        __clevy__ => \&get_current_context,
         Text::Clevy::Function->get_table(),
         Text::Clevy::Modifier->get_table(),
     );
@@ -36,9 +36,24 @@ sub new {
     return $self;
 }
 
-sub get_env { # for plugins
-    my $args = __PACKAGE__->render_args() or die "No PSGI env given.\n";
-    return $args->{_clevy_env} ||= Text::Clevy::Env->new(psgi_env => $args->{env} || {});
+sub render_string {
+    my($self, $str, $vars, @args) = @_;
+
+    local $self->{clevy_context_args} = \@args;
+    return $self->SUPER::render_string($str, $vars);
+}
+
+sub render {
+    my($self, $str, $vars, @args) = @_;
+
+    local $self->{clevy_context_args} = \@args;
+    return $self->SUPER::render($str, $vars);
+}
+
+sub get_current_context {
+    my $self = __PACKAGE__->engine()
+        or Carp::confess("Cannot get clevy context outside render()");
+    return $self->{clevy_context} ||= Text::Clevy::Context->new(@{$self->{clevy_context_args}});
 }
 
 1;

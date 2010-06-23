@@ -50,7 +50,7 @@ sub config_load {
     my $c = Config::Tiny->read($args{file})
         || Carp::croak(Config::Tiny->errstr);
 
-    my $config = $EngineClass->get_env->config;
+    my $config = $EngineClass->get_current_context->config;
 
     while(my($section_name, $section_config) = each %{$c}) {
         my $storage = $section_name eq '_'
