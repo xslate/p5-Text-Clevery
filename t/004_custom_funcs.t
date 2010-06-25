@@ -1,0 +1,88 @@
+#!perl -w
+
+use strict;
+use Test::More;
+
+use Text::Clevy;
+use Text::Clevy::Parser;
+
+my $tc = Text::Clevy->new(verbose => 2);
+
+my @set = (
+    [<<'T', { cust_ids => [100, 101, 102], cust_names => [qw(Joe Jack Jane)], customer_id => 100  }, <<'X'],
+{html_checkboxes name='id' values=$cust_ids output=$cust_names
+   selected=$customer_id  separator='<br />'}
+T
+<label><input type="checkbox" name="id" value="100" checked="checked" />Joe</label><br />
+<label><input type="checkbox" name="id" value="101" />Jack</label><br />
+<label><input type="checkbox" name="id" value="102" />Jane</label><br />
+
+X
+
+    [<<'T', { cust_ids => [100, 101, 102], cust_names => [qw(Joe Jack Jane)], customer_id => 101  }, <<'X'],
+{html_checkboxes name='id' values=$cust_ids output=$cust_names
+   selected=$customer_id  separator='<br />'}
+T
+<label><input type="checkbox" name="id" value="100" />Joe</label><br />
+<label><input type="checkbox" name="id" value="101" checked="checked" />Jack</label><br />
+<label><input type="checkbox" name="id" value="102" />Jane</label><br />
+
+X
+    [<<'T', { cust_ids => [100, 101, 102], cust_names => [qw(Joe Jack Jane)], customer_id => 102  }, <<'X'],
+{html_checkboxes name='id' values=$cust_ids output=$cust_names
+   selected=$customer_id  separator='<br />'}
+T
+<label><input type="checkbox" name="id" value="100" />Joe</label><br />
+<label><input type="checkbox" name="id" value="101" />Jack</label><br />
+<label><input type="checkbox" name="id" value="102" checked="checked" />Jane</label><br />
+
+X
+
+    [<<'T', { cust_ids => [100, 101, 102], cust_names => [qw(Joe Jack Jane)], customer_id => 101  }, <<'X', 'no selected'],
+{html_checkboxes name='id' values=$cust_ids output=$cust_names
+    separator='<br />'}
+T
+<label><input type="checkbox" name="id" value="100" />Joe</label><br />
+<label><input type="checkbox" name="id" value="101" />Jack</label><br />
+<label><input type="checkbox" name="id" value="102" />Jane</label><br />
+
+X
+
+    [<<'T', { cust_ids => [100, 101, 102], cust_names => [qw(Joe Jack Jane)], customer_id => 101  }, <<'X', 'no separator'],
+{html_checkboxes name='id' values=$cust_ids output=$cust_names
+   selected=$customer_id }
+T
+<label><input type="checkbox" name="id" value="100" />Joe</label>
+<label><input type="checkbox" name="id" value="101" checked="checked" />Jack</label>
+<label><input type="checkbox" name="id" value="102" />Jane</label>
+
+X
+
+    [<<'T', { cust_ids => [100, 101, 102], cust_names => [qw(Joe Jack Jane)], customer_id => 101  }, <<'X', 'labels=false'],
+{html_checkboxes name='id' values=$cust_ids output=$cust_names
+   selected=$customer_id  separator='<br />' labels=false}
+T
+<input type="checkbox" name="id" value="100" />Joe<br />
+<input type="checkbox" name="id" value="101" checked="checked" />Jack<br />
+<input type="checkbox" name="id" value="102" />Jane<br />
+
+X
+
+    [<<'T', { cust_ids => ["<100>", "<101>"], cust_names => [qw(<Joe> <Jack>)], customer_id => "<100>"  }, <<'X', 'auto escape'],
+{html_checkboxes name='<id>' values=$cust_ids output=$cust_names
+   selected=$customer_id  separator='<br />'}
+T
+<label><input type="checkbox" name="&lt;id&gt;" value="&lt;100&gt;" checked="checked" />&lt;Joe&gt;</label><br />
+<label><input type="checkbox" name="&lt;id&gt;" value="&lt;101&gt;" />&lt;Jack&gt;</label><br />
+
+X
+
+);
+
+for my $d(@set) {
+    my($source, $vars, $expected, $msg) = @{$d};
+    is eval { $tc->render_string($source, $vars) }, $expected, $msg
+        or do { ($@ && diag $@); diag $source };
+}
+
+done_testing;
