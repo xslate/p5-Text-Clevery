@@ -2,7 +2,7 @@ package Text::Clevy::Parser;
 use Any::Moose;
 extends 'Text::Xslate::Parser';
 
-use Text::Xslate::Util qw(p any_in value_to_literal);
+use Text::Xslate::Util qw(p any_in);
 
 sub _build_line_start { undef  }
 sub _build_tag_start  { '{' }
@@ -287,7 +287,7 @@ sub call {
 sub _not_implemented {
     my($self, $proto, $name) = @_;
     return $self->call($proto, '@clevy_not_implemented',
-        $proto->clone(arity => 'literal', value => value_to_literal($name)));
+        $proto->clone(arity => 'literal', value => $name));
 }
 
 no Any::Moose;
