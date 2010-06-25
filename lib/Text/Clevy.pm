@@ -15,6 +15,11 @@ use Text::Clevy::Context;
 use Text::Clevy::Function;
 use Text::Clevy::Modifier;
 
+my %builtin = (
+    '@clevy_context'              => \&get_current_context,
+    '@clevy_set_foreach_property' => \&_set_foreach_property,
+);
+
 sub options {
     my($self) = @_;
 
@@ -28,7 +33,7 @@ sub new {
     my $self = shift()->SUPER::new(@_);
 
     $self->register_function(
-        __clevy__ => \&get_current_context,
+        %builtin,
         Text::Clevy::Function->get_table(),
         Text::Clevy::Modifier->get_table(),
     );
@@ -54,6 +59,23 @@ sub get_current_context {
     my $self = __PACKAGE__->engine()
         or Carp::confess("Cannot get clevy context outside render()");
     return $self->{clevy_context} ||= Text::Clevy::Context->new(@{$self->{clevy_context_args}});
+}
+
+sub _set_foreach_property {
+    my($name, $index, $body) = @_;
+
+    my $context = get_current_context();
+
+    my $size = scalar @{$body};
+    $context->foreach->{$name} = {
+        index => $index,
+        iteration => $index + 1,
+        first     => $index == 0,
+        last      => $index == ($size - 1),
+        show      => undef, # ???
+        total     => $size,
+    };
+    return;
 }
 
 1;

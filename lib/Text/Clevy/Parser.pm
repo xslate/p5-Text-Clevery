@@ -83,13 +83,7 @@ sub init_symbols {
 
 sub nud_clevy_context {
     my($parser, $symbol) = @_;
-
-    # $clevy -> __clevy__()
-    return $symbol->clone(
-        arity  => 'call',
-        first  => $symbol->clone(id => '__clevy__', arity => 'name'),
-        second => [],
-    );
+    return $parser->call($symbol, '@clevy_context');
 }
 
 # variable modifiers
@@ -133,19 +127,14 @@ sub attr_list {
         push @args, $key->clone(arity => 'literal') => $value;
     }
 
-    return \@args;
+    return @args;
 }
 
 sub std_name {
     my($parser, $symbol) = @_;
 
-    my $args = $parser->attr_list();
-
-    return $symbol->clone(
-        arity  => 'call',
-        first  => $symbol,
-        second => $args,
-    );
+    my @args = $parser->attr_list();
+    return $parser->call($symbol, $symbol, @args);
 }
 
 sub define_function {
@@ -201,23 +190,56 @@ sub std_foreach {
 
     my $for = $symbol->clone( arity => 'for' );
 
-    my %args = @{ $parser->attr_list() };
+    my %args = $parser->attr_list();
 
-    my $from = $args{from} or $parser->_error("You must specify 'from' for {foreach}");
-    my $item = $args{item} or $parser->_error("You must specify 'item' for {foreach}");
+    my $from = $args{from} or $parser->_error("You must specify 'from' attribute for {foreach}");
+    my $item = $args{item} or $parser->_error("You must specify 'item' attribute for {foreach}");
     #my $key  = $args{key};
-    #my $name = $args{name};
+    my $name = $args{name};
 
     $item->id( '$' . $item->id );
+    $item->arity('variable');
 
     $for->first($from);
     $for->second([$item]);
-    $for->third( $parser->statements() );
+
+    $parser->new_scope();
+    my $iterator = $parser->define_iterator($item);
+    my $body = $parser->statements();
+    $parser->pop_scope();
+
+    # set_foreach_property(name, $~iter.index, $~iter.body)
+    if($name) {
+        unshift @{$body}, $parser->call($symbol,
+            '@clevy_set_foreach_property',
+            $name,
+            $iterator,
+            $parser->iterator_body($iterator),
+        );
+    }
+    $for->third($body);
 
     $parser->advance('/');
     $parser->advance('foreach');
 
     return $for;
+}
+
+sub call {
+    my($parser, $proto, $function, @args) = @_;
+
+    if(!ref $function) {
+        $function = $proto->clone(
+            arity => 'name',
+            id    => $function,
+        );
+    }
+
+    return $proto->clone(
+        arity  => 'call',
+        first  => $function,
+        second => \@args,
+   );
 }
 
 no Any::Moose;
