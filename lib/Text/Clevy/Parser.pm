@@ -2,7 +2,7 @@ package Text::Clevy::Parser;
 use Any::Moose;
 extends 'Text::Xslate::Parser';
 
-use Text::Xslate::Util qw(p any_in);
+use Text::Xslate::Util qw(p any_in value_to_literal);
 
 sub _build_line_start { undef  }
 sub _build_tag_start  { '{' }
@@ -195,7 +195,7 @@ sub std_foreach {
 
     my $from = $args{from} or $parser->_error("You must specify 'from' attribute for {foreach}");
     my $item = $args{item} or $parser->_error("You must specify 'item' attribute for {foreach}");
-    #my $key  = $args{key};
+    my $key  = $args{key};
     my $name = $args{name};
 
     $item->id( '$' . $item->id );
@@ -256,6 +256,11 @@ sub std_foreach {
     $parser->advance('/');
     $parser->advance('foreach');
 
+    if(defined $key) {
+        $for = $parser->_not_implemented($symbol,
+            "'key' attribute for {foreach}");
+    }
+
     return $for;
 }
 
@@ -274,6 +279,12 @@ sub call {
         first  => $function,
         second => \@args,
    );
+}
+
+sub _not_implemented {
+    my($self, $proto, $name) = @_;
+    return $self->call($proto, '@clevy_not_implemented',
+        $proto->clone(arity => 'literal', value => value_to_literal($name)));
 }
 
 no Any::Moose;
