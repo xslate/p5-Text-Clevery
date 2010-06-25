@@ -80,6 +80,8 @@ sub html_checkboxes {
     my $assign    = $args{assign};
     my $labels    = $args{labels};
 
+    defined($assign) and die "NotImplemented: 'assign' attribute for html_checkboxes";
+
     $name      = 'checkbox'
                      if not defined $name;
     $labels    = 1   if not defined $labels;
