@@ -9,7 +9,7 @@ use Time::Piece qw(localtime);
 
 my $now = time();
 
-my $tc = Text::Clevy->new();
+my $tc = Text::Clevy->new(verbose => 2);
 
 my @set = (
     [<<'T', {lang => 'Clevy'}, <<'X'],

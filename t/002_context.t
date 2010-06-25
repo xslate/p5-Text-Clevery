@@ -17,7 +17,7 @@ my %env = (
     QUERY_STRING => 'foo=bar;bar=baz;lang=Xslate',
     SERVER_NAME  => 'my.host',
 );
-my $tc = Text::Clevy->new();
+my $tc = Text::Clevy->new(verbose => 2);
 
 $ENV{CLEVY_TESTING} = 'Smarty';
 

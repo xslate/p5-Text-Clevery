@@ -135,7 +135,10 @@ sub std_name {
     my($parser, $symbol) = @_;
 
     my @args = $parser->attr_list();
-    return $parser->call($symbol, $symbol, @args);
+    return $parser->symbol('print')->clone(
+        arity => 'command',
+        first => [$parser->call($symbol, $symbol, @args)],
+    );
 }
 
 sub define_function {

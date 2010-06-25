@@ -4,7 +4,10 @@ use warnings;
 
 use Config::Tiny;
 
-use Text::Xslate::Util qw(p literal_to_value);
+use Text::Xslate::Util qw(
+    p any_in literal_to_value
+    mark_raw html_escape
+);
 
 require Text::Clevy;
 our $EngineClass = 'Text::Clevy';
@@ -61,7 +64,65 @@ sub config_load {
             $storage->{$key} = literal_to_value($literal);
         }
     }
-    return;
+    return '';
 }
 
+
+sub html_checkboxes {
+    my(%args) = @_;
+
+    my $name      = $args{name};
+    my $values    = $args{values};
+    my $output    = $args{output};
+    my $selected  = $args{selected};
+    my $options   = $args{options};
+    my $separator = $args{separator};
+    my $assign    = $args{assign};
+    my $labels    = $args{labels};
+
+    $name      = 'checkbox'
+                     if not defined $name;
+    $labels    = 1   if not defined $labels;
+    $separator = q{} if not defined $separator;
+
+    unless(defined $options) {
+        $values or _required('values');
+        $output or _required('output');
+    }
+
+    if(defined $selected) {
+        $selected = [$selected] if ref($selected) ne 'ARRAY';
+    }
+
+    my $result = '';
+    for(my $i = 0; $i < @{$values}; $i++) {
+        $result .= q{<label>} if $labels;
+
+        my $id = $values->[$i];
+
+        my $checked = any_in($id, @{$selected})
+            ? q{ checked="checked"}
+            : q{}
+        ;
+
+        $result .= sprintf
+             q{<input type="checkbox" name="%s" value="%s"%s />%s},
+             html_escape($name),
+             html_escape($id),
+             $checked,
+             html_escape($output->[$i]),
+        ;
+
+        $result .= q{</label>} if $labels;
+
+        $result .= $separator . "\n";
+    }
+    return mark_raw($result);
+}
+
+sub _required {
+    my($name) = @_;
+    my $function = (caller(1))[3];
+    die "Required: '$name' attribute for $function";
+}
 1;
