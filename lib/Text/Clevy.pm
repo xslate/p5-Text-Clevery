@@ -18,6 +18,7 @@ use Text::Clevy::Modifier;
 my %builtin = (
     '@clevy_context'              => \&get_current_context,
     '@clevy_set_foreach_property' => \&_set_foreach_property,
+    '@clevy_array_is_not_empty'   => \&_array_is_not_empty,
 );
 
 sub options {
@@ -76,6 +77,11 @@ sub _set_foreach_property {
         total     => $size,
     };
     return;
+}
+
+sub _array_is_not_empty {
+    my($arrayref) = @_;
+    return defined($arrayref) && @{$arrayref} != 0;
 }
 
 1;

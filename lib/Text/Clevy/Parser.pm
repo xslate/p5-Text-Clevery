@@ -75,6 +75,7 @@ sub init_symbols {
     $parser->symbol('else')  ->is_block_end(1);
 
     $parser->symbol('foreach')->set_std(\&std_foreach);
+    $parser->symbol('foreachelse')->is_block_end(1);
 
     $parser->symbol('/')     ->is_block_end(1); # {/if}
 
@@ -218,6 +219,39 @@ sub std_foreach {
         );
     }
     $for->third($body);
+
+    if($parser->token->id eq 'foreachelse') {
+        $parser->advance();
+
+        # if array_is_empty(my $array = expr) {
+        #    foreach expr -> ...
+        # }
+        # else {
+        #    foreachelse ...
+        # }
+
+        my $else = $parser->statements();
+
+        my $tmpname = $parser->symbol('($foreach)')->clone(arity => 'name');
+        my $tmpinit = $symbol->clone(
+            arity        => 'constant',
+            first        => $tmpname,
+            second       => $from,
+        );
+        $for->first($tmpname);
+
+        my $array_is_not_empty = $parser->call($symbol,
+            '@clevy_array_is_not_empty', $tmpinit);
+
+        my $if = $symbol->clone(
+            arity  => 'if',
+            first  => $array_is_not_empty,
+            second => [$for],
+            third  => $else,
+       );
+
+       $for = $if;
+    }
 
     $parser->advance('/');
     $parser->advance('foreach');
