@@ -84,7 +84,7 @@ sub init_symbols {
 
 sub nud_clevy_context {
     my($parser, $symbol) = @_;
-    return $parser->call($symbol, '@clevy_context');
+    return $parser->call('@clevy_context');
 }
 
 # variable modifiers
@@ -137,7 +137,7 @@ sub std_name {
     my @args = $parser->attr_list();
     return $parser->symbol('print')->clone(
         arity => 'command',
-        first => [$parser->call($symbol, $symbol, @args)],
+        first => [$parser->call($symbol, @args)],
     );
 }
 
@@ -214,7 +214,7 @@ sub std_foreach {
 
     # set_foreach_property(name, $~iter.index, $~iter.body)
     if($name) {
-        unshift @{$body}, $parser->call($symbol,
+        unshift @{$body}, $parser->call(
             '@clevy_set_foreach_property',
             $name,
             $iterator,
@@ -243,7 +243,7 @@ sub std_foreach {
         );
         $for->first($tmpname);
 
-        my $array_is_not_empty = $parser->call($symbol,
+        my $array_is_not_empty = $parser->call(
             '@clevy_array_is_not_empty', $tmpinit);
 
         my $if = $symbol->clone(
@@ -267,26 +267,9 @@ sub std_foreach {
     return $for;
 }
 
-sub call {
-    my($parser, $proto, $function, @args) = @_;
-
-    if(!ref $function) {
-        $function = $proto->clone(
-            arity => 'name',
-            id    => $function,
-        );
-    }
-
-    return $proto->clone(
-        arity  => 'call',
-        first  => $function,
-        second => \@args,
-   );
-}
-
 sub _not_implemented {
     my($self, $proto, $name) = @_;
-    return $self->call($proto, '@clevy_not_implemented',
+    return $self->call('@clevy_not_implemented',
         $proto->clone(arity => 'literal', value => $name));
 }
 
