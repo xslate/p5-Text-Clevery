@@ -2,19 +2,23 @@ package Text::Clevy::Function;
 use strict;
 use warnings;
 
-use Config::Tiny;
+use Any::Moose '::Util::TypeConstraints';
+use Config::Tiny ();
 
 use Text::Xslate::Util qw(
     p any_in literal_to_value
     mark_raw html_escape
 );
 
+*_find_type = any_moose('::Util::TypeConstraints')
+    ->can('find_or_create_isa_type_constraint');
+
 require Text::Clevy;
 our $EngineClass = 'Text::Clevy';
 
 # {capture}, {foreach}, {literal}, {section}, {strip}
 # are defined as block statements
-my @functions = map { $_ => __PACKAGE__->can($_) || _not_impl($_) } qw(
+my @functions = map { $_ => __PACKAGE__->can($_) || _make_not_impl($_) } qw(
     config_load
     include
     include_php
@@ -40,12 +44,26 @@ my @functions = map { $_ => __PACKAGE__->can($_) || _not_impl($_) } qw(
     textformat
 );
 
+use constant { true => 1, false => 0 };
+
 sub get_table { @functions }
 
-sub _not_impl {
+sub _make_not_impl {
     my($name) = @_;
     return sub { die "Function $name is not implemented.\n" };
 }
+
+sub _required {
+    my($name, $level) = @_;
+    my $function = (caller($level ? $level + 1 : 1))[3];
+    Carp::croak("Required: '$name' attribute for $function");
+}
+
+sub _bad_param {
+    my($type, $name, $value) = @_;
+    Carp::croak("InvalidValue for '$name': " . _find_type($type)->get_message($value));
+}
+
 
 sub config_load {
     my(%args) = @_;
@@ -67,64 +85,128 @@ sub config_load {
     return '';
 }
 
+# for HTML components
+sub _attrs {
+    my $s = '';
+    while(my($name, $value) = splice @_, 0, 2) {
+        if(defined $value) {
+            $s .= sprintf q{%s="%s" }, html_escape($name), html_escape($value);
+        }
+    }
+    chop $s;
+    return $s;
+}
+
+sub _parse_args {
+    my $args = shift;
+    if(@_ % 5) {
+        Carp::croak("Oops: " . p(@_));
+    }
+    while(my($name, $var_ref, $type, $required, $default) = splice @_, 0, 5) {
+        if(exists $args->{$name}) {
+            my $value = delete $args->{$name};
+            _find_type->($type)->check($value)
+                or _bad_param($type, $name, $value);
+            ${$var_ref} = $value;
+        }
+        elsif($required){
+            _required($name, 1);
+        }
+        else {
+#            ${$var_ref} = ref($default) eq 'CODE'
+#                ? $default->()
+#                : $default;
+            ${$var_ref} = $default;
+        }
+    }
+    return if keys(%{$args}) == 0;
+    return map { $_ => $args->{$_} } sort keys %{$args};
+}
+
 
 sub html_checkboxes {
-    my(%args) = @_;
+    my @extra = _parse_args(
+        {@_},
+        # name => var_ref, type, required, default
+        name      => \my $name,      'Str',          false, 'checkbox',
+        values    => \my $values,    'ArrayRef' ,    false, undef,
+        output    => \my $output,    'ArrayRef',     false, undef,
+        selected  => \my $selected,  'Str|ArrayRef', false, [],
+        options   => \my $options,   'HashRef',      false, undef,
+        separator => \my $separator, 'Str',          false, q{},
+        labels    => \my $labels,    'Bool',         false, true,
+    );
 
-    my $name      = $args{name};
-    my $values    = $args{values};
-    my $output    = $args{output};
-    my $selected  = $args{selected};
-    my $options   = $args{options};
-    my $separator = $args{separator};
-    my $assign    = $args{assign};
-    my $labels    = $args{labels};
-
-    defined($assign) and die "NotImplemented: 'assign' attribute for html_checkboxes";
-
-    $name      = 'checkbox'
-                     if not defined $name;
-    $labels    = 1   if not defined $labels;
-    $separator = q{} if not defined $separator;
-
-    unless(defined $options) {
+    if(not defined $options) {
         $values or _required('values');
         $output or _required('output');
     }
 
-    if(defined $selected) {
-        $selected = [$selected] if ref($selected) ne 'ARRAY';
+    if(ref $selected ne 'ARRAY') {
+        $selected = [$selected];
     }
 
-    my $result = '';
+    my @result;
     for(my $i = 0; $i < @{$values}; $i++) {
-        $result .= q{<label>} if $labels;
-
         my $id = $values->[$i];
 
-        my $checked = any_in($id, @{$selected})
-            ? q{ checked="checked"}
-            : q{}
+        my $input = sprintf q{<input %s />%s},
+            _attrs(
+                type  => 'checkbox',
+                name  => $name,
+                value => $id,
+                any_in($id, @{$selected}) ? (checked => 'checked') : (),
+                @extra,
+            ),
+            html_escape($output->[$i]),
         ;
 
-        $result .= sprintf
-             q{<input type="checkbox" name="%s" value="%s"%s />%s},
-             html_escape($name),
-             html_escape($id),
-             $checked,
-             html_escape($output->[$i]),
-        ;
+        $input = qq{<label>$input</label>} if $labels;
 
-        $result .= q{</label>} if $labels;
-
-        $result .= $separator . "\n";
+        push @result, $input . $separator;
     }
-    return mark_raw($result);
+    return mark_raw(join "\n", @result);
 }
 
-sub _required {
-    my($name) = @_;
-    my $function = (caller(1))[3];
-    die "Required: '$name' attribute for $function";
+sub html_image {
+    my @extra = _parse_args(
+        {@_},
+        # name => var_ref, type, required, default
+        file    => \my $file,    'Str', true,  undef,
+        height  => \my $height,  'Str', false, undef,
+        width   => \my $width,   'Str', false, undef,
+        basedir => \my $basedir, 'Str', false, q{},
+        alt     => \my $alt,     'Str', false, q{},
+        href    => \my $href,    'Str', false, undef,
+        path_prefix
+                => \my $path_prefix, 'Str', false, '',
+    );
+
+
+    if(!(defined $height and defined $width)) {
+        my $image_path;
+        if($file =~ m{\A /}xms) {
+            $image_path = $file;
+        }
+        else {
+            $image_path = $basedir . $file;
+        }
+        # TODO: calculate $height and $width from $image_path
+    }
+
+    my $img = sprintf(q{<img %s />},
+        _attrs(
+            src    => $path_prefix . $file,
+            alt    => $alt,
+            width  => $width,
+            height => $height,
+            @extra,
+        ));
+    if(defined $href) {
+        $img = sprintf q{<a href="%s">%s</a>}, html_escape($href), $img;
+    }
+    return mark_raw($img);
 }
+
+no Any::Moose '::Util::TypeConstraints';
 1;
