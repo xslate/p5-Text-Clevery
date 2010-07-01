@@ -47,6 +47,7 @@ sub render_string {
     my($self, $str, $vars, @args) = @_;
 
     local $self->{clevy_context_args} = \@args;
+    local $self->{clevy_context};
     return $self->SUPER::render_string($str, $vars);
 }
 
@@ -54,6 +55,7 @@ sub render {
     my($self, $str, $vars, @args) = @_;
 
     local $self->{clevy_context_args} = \@args;
+    local $self->{clevy_context};
     return $self->SUPER::render($str, $vars);
 }
 
