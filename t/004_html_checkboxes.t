@@ -79,6 +79,13 @@ T
 <label><input type="checkbox" name="&lt;id&gt;" value="&lt;101&gt;" />&lt;Jack&gt;</label><br />
 X
 
+    [<<'T', { cust => [[100, 'Joe'], [101, 'Jack']], customer_id => 100  }, <<'X', 'options'],
+{html_checkboxes name='id' options=$cust selected=$customer_id}
+T
+<label><input type="checkbox" name="id" value="100" checked="checked" />Joe</label>
+<label><input type="checkbox" name="id" value="101" />Jack</label>
+X
+
 );
 
 for my $d(@set) {

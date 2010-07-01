@@ -86,15 +86,26 @@ sub config_load {
 }
 
 # for HTML components
-sub _attrs {
-    my $s = '';
+sub _tag {
+    my $name    = shift;
+    my $content = shift;
+    my $attrs = '';
     while(my($name, $value) = splice @_, 0, 2) {
         if(defined $value) {
-            $s .= sprintf q{%s="%s" }, html_escape($name), html_escape($value);
+            $attrs .= sprintf q{ %s="%s"}, html_escape($name), html_escape($value);
         }
     }
-    chop $s;
-    return $s;
+    if(defined $content) {
+        return mark_raw(sprintf q{<%1$s%2$s>%3$s</%1$s>}, $name, $attrs, html_escape($content));
+    }
+    else {
+        return mark_raw(sprintf q{<%1$s%2$s />}, $name, $attrs);
+    }
+}
+
+sub _join_html {
+    my $sep = shift;
+    return mark_raw join $sep, map { html_escape($_) } @_;
 }
 
 sub _parse_args {
@@ -123,21 +134,42 @@ sub _parse_args {
     return map { $_ => $args->{$_} } sort keys %{$args};
 }
 
+sub _split_assoc_array {
+    my($assoc) = @_;
+    my @keys;
+    my @values;
+    if(ref $assoc eq 'HashRef') {
+        foreach my $key(sort keys %{$assoc}) {
+            push @keys,   $key;
+            push @values, $assoc->{$key};
+        }
+    }
+    else {
+        foreach my $pair(@{$assoc}) {
+            push @keys, $pair->[0];
+            push @values, $pair->[1];
+        }
+    }
+    return(\@keys, \@values);
+}
 
 sub html_checkboxes {
     my @extra = _parse_args(
         {@_},
         # name => var_ref, type, required, default
         name      => \my $name,      'Str',          false, 'checkbox',
-        values    => \my $values,    'ArrayRef' ,    false, undef,
-        output    => \my $output,    'ArrayRef',     false, undef,
+        values    => \my $values,    'ArrayRef' ,    undef, undef,
+        output    => \my $output,    'ArrayRef',     undef, undef,
         selected  => \my $selected,  'Str|ArrayRef', false, [],
-        options   => \my $options,   'HashRef',      false, undef,
+        options   => \my $options,   'ArrayRef|HashRef', undef, undef,
         separator => \my $separator, 'Str',          false, q{},
         labels    => \my $labels,    'Bool',         false, true,
     );
 
-    if(not defined $options) {
+    if(defined $options) {
+        ($values, $output) = _split_assoc_array($options);
+    }
+    else {
         $values or _required('values');
         $output or _required('output');
     }
@@ -146,26 +178,27 @@ sub html_checkboxes {
         $selected = [$selected];
     }
 
+    $separator = mark_raw($separator);
+
     my @result;
     for(my $i = 0; $i < @{$values}; $i++) {
-        my $id = $values->[$i];
+        my $value = $values->[$i];
 
-        my $input = sprintf q{<input %s />%s},
-            _attrs(
+        my $input = _join_html('', _tag(
+                input => undef,
                 type  => 'checkbox',
                 name  => $name,
-                value => $id,
-                any_in($id, @{$selected}) ? (checked => 'checked') : (),
+                value => $value,
+                any_in($value, @{$selected}) ? (checked => 'checked') : (),
                 @extra,
-            ),
-            html_escape($output->[$i]),
+            ), html_escape($output->[$i])),
         ;
 
-        $input = qq{<label>$input</label>} if $labels;
+        $input = _tag(label => $input) if $labels;
 
-        push @result, $input . $separator;
+        push @result, _join_html('', $input, $separator);
     }
-    return mark_raw(join "\n", @result);
+    return _join_html("\n", @result);
 }
 
 sub html_image {
@@ -194,18 +227,58 @@ sub html_image {
         # TODO: calculate $height and $width from $image_path
     }
 
-    my $img = sprintf(q{<img %s />},
-        _attrs(
-            src    => $path_prefix . $file,
-            alt    => $alt,
-            width  => $width,
-            height => $height,
-            @extra,
-        ));
+    my $img = _tag(
+        img    => undef,
+        src    => $path_prefix . $file,
+        alt    => $alt,
+        width  => $width,
+        height => $height,
+        @extra,
+    );
     if(defined $href) {
-        $img = sprintf q{<a href="%s">%s</a>}, html_escape($href), $img;
+        $img = _tag(a => $img, href => $href);
     }
-    return mark_raw($img);
+    return $img;
+}
+
+sub html_options {
+    my @extra = _parse_args(
+        values   => \my $values,   'ArrayRef',     undef, undef,
+        output   => \my $output,   'ArrayRef',     undef, undef,
+        selected => \my $selected, 'Str|ArrayRef', false, [],
+        options  => \my $options,  'ArrayRef',     undef, undef,
+        name     => \my $name,     'Str',          false, undef,
+    );
+
+    if(defined $options) {
+        ($values, $output) = _split_assoc_array($options);
+    }
+    else {
+        $values or _required('values');
+        $output or _required('output');
+    }
+
+    if(ref $selected ne 'ARRAY') {
+        $selected = [$selected];
+    }
+
+    my @result;
+    for(my $i = 0; $i < @{$values}; $i++) {
+        my $value = $values->[$i];
+
+        push @result, _tag(
+            option => $output->[$i],
+            value  => $value,
+            (any_in($value, @{$selected}) ? (checked => 'checked') : ()),
+        );
+
+    }
+
+    return _tag(
+        select => _join_html("\n", @result, ''),
+        name   => $name,
+        @extra,
+    );
 }
 
 no Any::Moose '::Util::TypeConstraints';
