@@ -112,8 +112,16 @@ This document describes Text::Clevy version 0.01.
     my %vars = (
         lang => 'Smarty',
     );
+
+    # pass PSGI environment as 'env'
     my $psgi_env = {};
-    print $tc->render_string('Hello, {$lang} world!', \%vars, env => $psgi_env);
+    print $tc->render_string('Hello, {$lang} world!',
+        \%vars, env => $psgi_env);
+
+    # or pass a request object as 'request'
+    my $request = Plack::Request->new($psgi_env);
+    print $tc->render_string('Hello, {$lang} world',
+        \%vars, request => $request);
 
 =head1 DESCRIPTION
 
