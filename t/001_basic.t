@@ -174,6 +174,16 @@ T
     [baz]
 X
 
+    [<<'T', { a => { b => [qw(foo bar baz)] }}, <<'X'],
+{foreach from=`$a.b` item=it -}
+    [{$it}]
+{/foreach -}
+T
+    [foo]
+    [bar]
+    [baz]
+X
+
     [<<'T', { value => 'foo' }, <<'X'],
 {literal}[{$value}]{/literal}
 T

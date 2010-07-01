@@ -63,6 +63,8 @@ sub init_symbols {
 
     $parser->init_basic_operators();
 
+    $parser->symbol('`')->set_nud(\&nud_backquote);
+
     $parser->symbol('(name)')->set_std(\&std_name);
 
     $parser->symbol('|')     ->set_led(\&led_bar);
@@ -80,6 +82,13 @@ sub init_symbols {
     $parser->symbol('/')     ->is_block_end(1); # {/if}
 
     return;
+}
+
+sub nud_backquote { # the same as parens
+    my($parser, $symbol) = @_;
+    my $expr = $parser->expression(0);
+    $parser->advance('`');
+    return $expr;
 }
 
 sub nud_clevy_context {
