@@ -138,7 +138,7 @@ sub _split_assoc_array {
     my($assoc) = @_;
     my @keys;
     my @values;
-    if(ref $assoc eq 'HashRef') {
+    if(ref $assoc eq 'HASH') {
         foreach my $key(sort keys %{$assoc}) {
             push @keys,   $key;
             push @values, $assoc->{$key};
@@ -146,7 +146,7 @@ sub _split_assoc_array {
     }
     else {
         foreach my $pair(@{$assoc}) {
-            push @keys, $pair->[0];
+            push @keys,   $pair->[0];
             push @values, $pair->[1];
         }
     }
@@ -157,13 +157,13 @@ sub html_checkboxes {
     my @extra = _parse_args(
         {@_},
         # name => var_ref, type, required, default
-        name      => \my $name,      'Str',          false, 'checkbox',
-        values    => \my $values,    'ArrayRef' ,    undef, undef,
-        output    => \my $output,    'ArrayRef',     undef, undef,
-        selected  => \my $selected,  'Str|ArrayRef', false, [],
+        name      => \my $name,      'Str',              false, 'checkbox',
+        values    => \my $values,    'ArrayRef' ,        undef, undef,
+        output    => \my $output,    'ArrayRef',         undef, undef,
+        selected  => \my $selected,  'Str|ArrayRef',     false, [],
         options   => \my $options,   'ArrayRef|HashRef', undef, undef,
-        separator => \my $separator, 'Str',          false, q{},
-        labels    => \my $labels,    'Bool',         false, true,
+        separator => \my $separator, 'Str',              false, q{},
+        labels    => \my $labels,    'Bool',             false, true,
     );
 
     if(defined $options) {
@@ -241,13 +241,42 @@ sub html_image {
     return $img;
 }
 
+sub _build_options {
+    my($values, $labels, $selected) = @_;
+    my @result;
+    for(my $i = 0; $i < @{$values}; $i++) {
+        my $value = $values->[$i];
+        my $label = $labels->[$i];
+
+        if(!(ref($label) eq 'ARRAY' or ref($label) eq 'HASH')) {
+            push @result, _tag(
+                option => $label,
+                # label => $label,
+                value  => $value,
+                (any_in($value, @{$selected}) ? (selected => 'selected') : ()),
+            );
+        }
+        else {
+            my($v, $l) = _split_assoc_array($label);
+            my @group = _build_options($v, $l, $selected);
+            push @result, _tag(
+                optgroup => _join_html("\n", "", @group, ""),
+                label    => $value,
+            );
+
+        }
+    }
+    return @result;
+}
+
 sub html_options {
     my @extra = _parse_args(
-        values   => \my $values,   'ArrayRef',     undef, undef,
-        output   => \my $output,   'ArrayRef',     undef, undef,
-        selected => \my $selected, 'Str|ArrayRef', false, [],
-        options  => \my $options,  'ArrayRef',     undef, undef,
-        name     => \my $name,     'Str',          false, undef,
+        {@_},
+        values   => \my $values,   'ArrayRef',         undef, undef,
+        output   => \my $output,   'ArrayRef',         undef, undef,
+        selected => \my $selected, 'Str|ArrayRef',     false, [],
+        options  => \my $options,  'ArrayRef|HashRef', undef, undef,
+        name     => \my $name,     'Str',              false, undef,
     );
 
     if(defined $options) {
@@ -262,23 +291,18 @@ sub html_options {
         $selected = [$selected];
     }
 
-    my @result;
-    for(my $i = 0; $i < @{$values}; $i++) {
-        my $value = $values->[$i];
+    my @result = _build_options($values, $output, $selected);
 
-        push @result, _tag(
-            option => $output->[$i],
-            value  => $value,
-            (any_in($value, @{$selected}) ? (checked => 'checked') : ()),
+    if(defined $name) {
+        return _tag(
+            select => _join_html("\n", '', @result, ''),
+            name   => $name,
+            @extra,
         );
-
     }
-
-    return _tag(
-        select => _join_html("\n", @result, ''),
-        name   => $name,
-        @extra,
-    );
+    else {
+        return _join_html("\n", @result);
+    }
 }
 
 no Any::Moose '::Util::TypeConstraints';
