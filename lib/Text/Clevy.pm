@@ -20,15 +20,11 @@ my %builtin = (
     '@clevy_set_foreach_property' => \&_set_foreach_property,
     '@clevy_array_is_not_empty'   => \&_array_is_not_empty,
     '@clevy_not_implemented'      => \&_not_implemented,
+    Text::Clevy::Function->get_table(),
+    Text::Clevy::Modifier->get_table(),
 );
 
-sub default_functions {
-    return {
-        %builtin,
-        Text::Clevy::Function->get_table(),
-        Text::Clevy::Modifier->get_table(),
-    };
-}
+sub default_functions { \%builtin }
 
 sub options {
     my($self) = @_;
