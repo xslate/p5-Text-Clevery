@@ -22,6 +22,14 @@ my %builtin = (
     '@clevy_not_implemented'      => \&_not_implemented,
 );
 
+sub default_functions {
+    return {
+        %builtin,
+        Text::Clevy::Function->get_table(),
+        Text::Clevy::Modifier->get_table(),
+    };
+}
+
 sub options {
     my($self) = @_;
 
@@ -29,18 +37,6 @@ sub options {
 
     $opts->{syntax} = 'Text::Clevy::Parser';
     return $opts;
-}
-
-sub new {
-    my $self = shift()->SUPER::new(@_);
-
-    $self->register_function(
-        %builtin,
-        Text::Clevy::Function->get_table(),
-        Text::Clevy::Modifier->get_table(),
-    );
-
-    return $self;
 }
 
 sub render_string {
