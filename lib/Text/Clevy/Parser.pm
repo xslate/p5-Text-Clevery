@@ -67,7 +67,7 @@ sub init_symbols {
 
     $parser->symbol('(name)')->set_std(\&std_name);
 
-    $parser->symbol('|')     ->set_led(\&led_bar);
+    $parser->symbol('|')     ->set_led(\&led_pipe);
 
     $parser->symbol('$clevy') ->set_nud(\&nud_clevy_context);
     $parser->symbol('$smarty')->set_nud(\&nud_clevy_context);
@@ -98,10 +98,10 @@ sub nud_clevy_context {
 
 # variable modifiers
 # expr | modifier : param1 : param2 ...
-sub led_bar {
+sub led_pipe {
     my($parser, $symbol, $left) = @_;
 
-    my $bar = $parser->SUPER::led_bar($symbol, $left);
+    my $bar = $parser->SUPER::led_pipe($symbol, $left);
 
     my @args;
     while($parser->token->id eq ':') {
