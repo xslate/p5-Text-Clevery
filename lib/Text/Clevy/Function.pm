@@ -4,6 +4,7 @@ use warnings;
 
 use Any::Moose '::Util::TypeConstraints';
 use Config::Tiny ();
+use File::Spec;
 
 use Text::Xslate::Util qw(
     p any_in literal_to_value
@@ -219,12 +220,15 @@ sub html_image {
     if(!(defined $height and defined $width)) {
         my $image_path;
         if($file =~ m{\A /}xms) {
+            # TODO: DOCUMENT_ROOT?
             $image_path = $file;
         }
         else {
-            $image_path = $basedir . $file;
+            $image_path = File::Spec->catfile($basedir, $file);
         }
-        # TODO: calculate $height and $width from $image_path
+        require Image::Size;
+        # it returns (undef, undef, $status_message) on fails
+        ($width, $height) = Image::Size::imgsize($image_path);
     }
 
     my $img = _tag(

@@ -33,6 +33,12 @@ T
 <img src="foo.jpg" alt="foobar" style="border: none" />
 X
 
+    [<<'T', {  }, <<'X'],
+{html_image file="viola.jpg" basedir="t/data"}
+T
+<img src="viola.jpg" alt="" width="240" height="240" />
+X
+
 );
 
 for my $d(@set) {

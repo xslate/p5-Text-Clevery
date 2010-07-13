@@ -8,6 +8,7 @@ requires 'Any::Moose'     => 0.13;
 requires 'Text::Xslate'   => 0.1045;
 requires 'Config::Tiny'   => 2.12;
 requires 'Plack'          => 0.9938;
+requires 'Image::Size'    => 3.221;
 
 test_requires 'Test::More' => 0.88; # done_testing()
 
