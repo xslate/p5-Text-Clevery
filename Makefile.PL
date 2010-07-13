@@ -5,7 +5,7 @@ use inc::Module::Install;
 all_from 'lib/Text/Clevy.pm';
 
 requires 'Any::Moose'     => 0.13;
-requires 'Text::Xslate'   => 0.1044;
+requires 'Text::Xslate'   => 0.1045;
 requires 'Config::Tiny'   => 2.12;
 requires 'Plack'          => 0.9938;
 

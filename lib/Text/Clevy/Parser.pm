@@ -4,6 +4,8 @@ extends 'Text::Xslate::Parser';
 
 use Text::Xslate::Util qw(p any_in);
 
+sub _build_identity_pattern { qr{ [/\$]? [a-zA-Z_][a-zA-Z0-9_]* }xms }
+
 sub _build_line_start { undef  }
 sub _build_tag_start  { '{' }
 sub _build_tag_end    { '}' }
@@ -79,7 +81,8 @@ sub init_symbols {
     $parser->symbol('foreach')->set_std(\&std_foreach);
     $parser->symbol('foreachelse')->is_block_end(1);
 
-    $parser->symbol('/')     ->is_block_end(1); # {/if}
+    $parser->symbol('/if')      ->is_block_end(1);
+    $parser->symbol('/foreach') ->is_block_end(1);
 
     return;
 }
@@ -192,8 +195,7 @@ sub std_if {
         $if->third( $parser->statements() );
     }
 
-    $parser->advance('/');
-    $parser->advance('if');
+    $parser->advance('/if');
 
     return $top_if;
 }
@@ -265,8 +267,7 @@ sub std_foreach {
        $for = $if;
     }
 
-    $parser->advance('/');
-    $parser->advance('foreach');
+    $parser->advance('/foreach');
 
     if(defined $key) {
         $for = $parser->_not_implemented($symbol,
