@@ -218,17 +218,16 @@ sub html_image {
 
 
     if(!(defined $height and defined $width)) {
-        my $image_path;
-        if($file =~ m{\A /}xms) {
-            # TODO: DOCUMENT_ROOT?
-            $image_path = $file;
-        }
-        else {
-            $image_path = File::Spec->catfile($basedir, $file);
-        }
-        require Image::Size;
-        # it returns (undef, undef, $status_message) on fails
-        ($width, $height) = Image::Size::imgsize($image_path);
+        eval {
+            require Image::Size;
+            if($file =~ m{\A /}xms) {
+                my $env = $EngineClass->get_current_context->psgi_env;
+                $basedir = $env->{DOCUMENT_ROOT} || '.';
+            }
+            my $image_path = File::Spec->catfile($basedir, $file);
+            # it returns (undef, undef, $status_message) on fails
+            ($width, $height) = Image::Size::imgsize($image_path);
+        };
     }
 
     my $img = _tag(

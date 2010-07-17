@@ -33,7 +33,7 @@ T
 <img src="foo.jpg" alt="foobar" style="border: none" />
 X
 
-    [<<'T', {  }, <<'X'],
+    eval { require Image::Size } ? [<<'T', {  }, <<'X', 'auto image size'] : (),
 {html_image file="viola.jpg" basedir="t/data"}
 T
 <img src="viola.jpg" alt="" width="240" height="240" />
