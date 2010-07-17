@@ -65,15 +65,19 @@ sub init_symbols {
 
     $parser->init_basic_operators();
 
+    # special symbols
     $parser->symbol('`')->set_nud(\&nud_backquote);
-
     $parser->symbol('(name)')->set_std(\&std_name);
 
-    $parser->symbol('|')     ->set_led(\&led_pipe);
+    # operators
+    $parser->symbol('|')      ->set_led(\&led_pipe); # reset
+    $parser->infix('->', 256) ->set_led($parser->can('led_dot'));
 
+    # special variables
     $parser->symbol('$clevy') ->set_nud(\&nud_clevy_context);
     $parser->symbol('$smarty')->set_nud(\&nud_clevy_context);
 
+    # statement tokens
     $parser->symbol('if')    ->set_std(\&std_if);
     $parser->symbol('elseif')->is_block_end(1);
     $parser->symbol('else')  ->is_block_end(1);

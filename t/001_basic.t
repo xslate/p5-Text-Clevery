@@ -5,7 +5,7 @@ use Test::More;
 
 use Text::Clevy;
 use Text::Clevy::Parser;
-use Time::Piece qw(localtime);
+use Time::Piece ();
 
 my $now = time();
 
@@ -17,6 +17,20 @@ Hello, {$lang} world!
 T
 Hello, Clevy world!
 X
+
+    [<<'T', {h => { lang => 'Clevy' }}, <<'X'],
+Hello, {$h.lang} world!
+T
+Hello, Clevy world!
+X
+
+    [<<'T', {now => Time::Piece->new($now)}, Time::Piece->new($now)->year, 'arrow'],
+{ $now.year -}
+T
+
+    [<<'T', {now => Time::Piece->new($now)}, Time::Piece->new($now)->year, 'arrow'],
+{ $now.year() -}
+T
 
     [<<'T', {lang => 'Clevy'}, <<'X'],
 Hello, {* this is a comment *}{$lang}{* this is another comment *} world!
@@ -112,7 +126,7 @@ T
     33
 X
 
-    [<<'T', {now => $now}, sprintf <<'X', localtime($now)->year],
+    [<<'T', {now => $now}, sprintf <<'X', Time::Piece->new($now)->year],
     {$now|date_format:"[%Y]"}
 T
     [%s]
