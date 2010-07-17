@@ -4,12 +4,11 @@ use Plack::Request;
 
 my $smarty_compat_version = '2.6';
 
-has psgi_env => (
+has env => (
     is  => 'ro',
     isa => 'HashRef',
 
-    init_arg => 'env',
-    default  => \&_build_hashref,
+    default => sub { \%ENV },
 );
 
 has request => (
@@ -19,7 +18,7 @@ has request => (
     lazy    => 1,
     default => sub {
         my($self) = @_;
-        return Plack::Request->new( $self->psgi_env );
+        return Plack::Request->new( $self->env );
     },
 
     handles => {
@@ -117,9 +116,7 @@ has ldelim => (
     default => '}',
 );
 
-sub env { \%ENV }
-
-sub server { shift()->psgi_env }
+sub server { shift()->env }
 
 sub version { $smarty_compat_version }
 

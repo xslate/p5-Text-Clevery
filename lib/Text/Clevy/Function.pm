@@ -221,7 +221,7 @@ sub html_image {
         eval {
             require Image::Size;
             if($file =~ m{\A /}xms) {
-                my $env = $EngineClass->get_current_context->psgi_env;
+                my $env = $EngineClass->get_current_context->env;
                 $basedir = $env->{DOCUMENT_ROOT} || '.';
             }
             my $image_path = File::Spec->catfile($basedir, $file);

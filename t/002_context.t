@@ -14,12 +14,12 @@ use Text::Xslate::Util qw(html_escape);
 
 
 my %env = (
-    QUERY_STRING => 'foo=bar;bar=baz;lang=Xslate',
-    SERVER_NAME  => 'my.host',
+    %ENV,
+    CLEVY_TESTING => 'Smarty',
+    QUERY_STRING  => 'foo=bar;bar=baz;lang=Xslate',
+    SERVER_NAME   => 'my.host',
 );
 my $tc = Text::Clevy->new(verbose => 2);
-
-$ENV{CLEVY_TESTING} = 'Smarty';
 
 my @set = (
     [<<'T', {}, sprintf(<<'X', html_escape($env{QUERY_STRING}))],
