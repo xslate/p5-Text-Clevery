@@ -3,22 +3,20 @@
 use strict;
 use Test::More;
 
-use Text::Clevy;
-use Text::Clevy::Parser;
-
-use Time::Piece ();
-use POSIX ();
-
 my $now;
 BEGIN{
+    require Time::Piece;
+    require POSIX;
     POSIX::setlocale(POSIX::LC_ALL(), 'C');
 
     $now = Time::Piece->strptime(
-        '2010-7-18 23:12:34',
+        '2010-7-18 13:12:34',
         '%Y-%m-%d %H:%M:%S'
     )->epoch;
     *CORE::GLOBAL::time = sub { $now }; # mock
 }
+use Text::Clevy;
+use Text::Clevy::Parser;
 
 my $tc = Text::Clevy->new(verbose => 2);
 
@@ -33,7 +31,7 @@ T
 <option value="04">April</option>
 <option value="05">May</option>
 <option value="06">June</option>
-<option value="07">July</option>
+<option value="07" selected="selected">July</option>
 <option value="08">August</option>
 <option value="09">September</option>
 <option value="10">October</option>
@@ -58,7 +56,7 @@ T
 <option value="15">15</option>
 <option value="16">16</option>
 <option value="17">17</option>
-<option value="18">18</option>
+<option value="18" selected="selected">18</option>
 <option value="19">19</option>
 <option value="20">20</option>
 <option value="21">21</option>
@@ -74,7 +72,7 @@ T
 <option value="31">31</option>
 </select>
 <select name="Date_Year">
-<option value="2010">2010</option>
+<option value="2010" selected="selected">2010</option>
 </select>
 X
 
@@ -82,7 +80,7 @@ X
 {html_select_date field_order="ymd" field_separator="\n--\n"}
 T
 <select name="Date_Year">
-<option value="2010">2010</option>
+<option value="2010" selected="selected">2010</option>
 </select>
 --
 <select name="Date_Month">
@@ -92,7 +90,7 @@ T
 <option value="04">April</option>
 <option value="05">May</option>
 <option value="06">June</option>
-<option value="07">July</option>
+<option value="07" selected="selected">July</option>
 <option value="08">August</option>
 <option value="09">September</option>
 <option value="10">October</option>
@@ -118,7 +116,7 @@ T
 <option value="15">15</option>
 <option value="16">16</option>
 <option value="17">17</option>
-<option value="18">18</option>
+<option value="18" selected="selected">18</option>
 <option value="19">19</option>
 <option value="20">20</option>
 <option value="21">21</option>
@@ -140,7 +138,7 @@ X
 T
 <select name="Date_Year">
 <option value="2009">2009</option>
-<option value="2010">2010</option>
+<option value="2010" selected="selected">2010</option>
 <option value="2011">2011</option>
 <option value="2012">2012</option>
 </select>
@@ -156,7 +154,7 @@ T
 <select name="Date_Year">
 <option value="">please select an year</option>
 <option value="2009">2009</option>
-<option value="2010">2010</option>
+<option value="2010" selected="selected">2010</option>
 <option value="2011">2011</option>
 </select>
 X
@@ -193,7 +191,7 @@ T
 <option value="15">15</option>
 <option value="16">16</option>
 <option value="17">17</option>
-<option value="18">18</option>
+<option value="18" selected="selected">18</option>
 <option value="19">19</option>
 <option value="20">20</option>
 <option value="21">21</option>
@@ -230,7 +228,7 @@ T
 <option value="04">April</option>
 <option value="05">May</option>
 <option value="06">June</option>
-<option value="07">July</option>
+<option value="07" selected="selected">July</option>
 <option value="08">August</option>
 <option value="09">September</option>
 <option value="10">October</option>
@@ -253,7 +251,7 @@ X
     display_years=true}
 T
 <select name="Date_Year" size="12" class="select_date" class="year">
-<option value="2010">2010</option>
+<option value="2010" selected="selected">2010</option>
 </select>
 X
 );

@@ -434,7 +434,7 @@ sub _time_object {
 
 sub _build_date_options {
     my($field_array, $prefix, $moniker,
-       $empty, $values_ref, $names_ref,
+       $empty, $values_ref, $names_ref, $selected,
        $size, @others) = @_;
 
     my $name = defined($field_array)
@@ -467,8 +467,9 @@ sub _build_date_options {
     }
 
     my $options = html_options(
-        values => $values_ref,
-        output => $names_ref,
+        values   => $values_ref,
+        output   => $names_ref,
+        selected => $selected,
     );
     return make_tag(
         select => safe_cat("\n", $options, "\n"),
@@ -546,6 +547,7 @@ sub html_select_date {
             $month_empty,
             \@values,
             \@names,
+            $time->strftime($month_value_format),
             $month_size,
             $all_extra,
             $month_extra,
@@ -564,6 +566,7 @@ sub html_select_date {
             $month_empty,
             \@dayvals,
             \@days,
+            sprintf($day_value_format, $time->mday), # day of month
             $day_size,
             $all_extra,
             $day_extra,
@@ -580,6 +583,7 @@ sub html_select_date {
             $year_empty,
             \@years,
             \@years,
+            $time->year,
             $year_size,
             $all_extra,
             $year_extra,
