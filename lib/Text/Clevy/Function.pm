@@ -416,7 +416,7 @@ sub html_radios {
     return safe_join "\n", @result;
 }
 
-sub _time_object {
+sub _init_time_object {
     my($time) = @_;
     $time = time() if not defined $time;
 
@@ -432,7 +432,7 @@ sub _time_object {
     return $time;
 }
 
-sub _build_date_options {
+sub _build_datetime_options {
     my($field_array, $prefix, $moniker,
        $empty, $values_ref, $names_ref, $selected,
        $size, @others) = @_;
@@ -485,28 +485,35 @@ sub html_select_date {
         time               => \my $time,               $Str,  false, undef,
         start_year         => \my $start_year,         $Str,  false, undef,
         end_year           => \my $end_year,           $Str,  false, undef,
+
         display_days       => \my $display_days,       $Bool, false, true,
         display_months     => \my $display_months,     $Bool, false, true,
         display_years      => \my $display_years,      $Bool, false, true,
+
         month_format       => \my $month_format,       $Str,  false, '%B',   # for strftime
+        month_value_format => \my $month_value_format, $Str,  false, '%m',  # for strftime
         day_format         => \my $day_format,         $Str,  false, '%02d', # for sprintf
         day_value_format   => \my $day_value_format,   $Str,  false, '%d',   # for sprintf
+
         year_as_text       => \my $year_as_text,       $Bool, false, false,
         reverse_years      => \my $reverse_years,      $Bool, false, false,
         field_array        => \my $field_array,        $Str,  false, undef,
+
         day_size           => \my $day_size,           $Int,  false, undef,
         month_size         => \my $month_size,         $Int,  false, undef,
         year_size          => \my $year_size,          $Int,  false, undef,
+
         all_extra          => \my $all_extra,          $Str,  false, undef,
         day_extra          => \my $day_extra,          $Str,  false, undef,
         month_extra        => \my $month_extra,        $Str,  false, undef,
         year_extra         => \my $year_extra,         $Str,  false, undef,
-        field_order        => \my $field_order,        $Str,  false, 'MDY',
-        field_separator    => \my $field_separator,    $Str,  false, "\n",
-        month_value_format => \my $month_value_format, $Str,  false, '%m',  # for strftime
+
         year_empty         => \my $year_empty,         $Str,  false, undef,
         month_empty        => \my $month_empty,        $Str,  false, undef,
         day_empty          => \my $day_empty,          $Str,  false, undef,
+
+        field_order        => \my $field_order,        $Str,  false, 'MDY',
+        field_separator    => \my $field_separator,    $Str,  false, "\n",
     );
     if(%extra) {
         warnings::warn(misc => "html_select_options: unknown option(s): "
@@ -516,7 +523,7 @@ sub html_select_date {
     require Time::Piece;
 
     # complex default values
-    $time = _time_object($time);
+    $time = _init_time_object($time);
 
     if(not defined $start_year) {
         $start_year = $time->year;
@@ -542,7 +549,7 @@ sub html_select_date {
             push @names,  $t->strftime($month_format);
             push @values, $t->strftime($month_value_format);
         }
-        $result{M} = _build_date_options(
+        $result{M} = _build_datetime_options(
             $field_array, $prefix, 'Month',
             $month_empty,
             \@values,
@@ -561,7 +568,7 @@ sub html_select_date {
             push @days,    sprintf($day_format, $d);
             push @dayvals, sprintf($day_value_format, $d);
         }
-        $result{D} = _build_date_options(
+        $result{D} = _build_datetime_options(
             $field_array, $prefix, 'Day',
             $month_empty,
             \@dayvals,
@@ -578,7 +585,7 @@ sub html_select_date {
         if($reverse_years) {
             @years = reverse @years;
         }
-        $result{Y} = _build_date_options(
+        $result{Y} = _build_datetime_options(
             $field_array, $prefix, 'Year',
             $year_empty,
             \@years,
@@ -590,7 +597,6 @@ sub html_select_date {
         );
     }
 
-
     my @order = split //, uc $field_order;
     return safe_join $field_separator, grep { defined } @result{@order};
 }
@@ -600,18 +606,34 @@ sub html_select_time {
         {@_},
         prefix             => \my $prefix,             $Str,  false, 'Time_',
         time               => \my $time,               $Str,  false, undef,
+
         display_hours      => \my $display_hours,      $Bool, false, true,
         display_minutes    => \my $display_minutes,    $Bool, false, true,
         display_seconds    => \my $display_seconds,    $Bool, false, true,
         display_meridian   => \my $display_meridian,   $Bool, false, true, # am/pm
+
         use_24_hours       => \my $use_24_hours,       $Bool, false, true,
         minute_interval    => \my $minute_interval,    $Int,  false, 1,
         second_interval    => \my $second_interval,    $Int,  false, 1,
         field_array        => \my $field_array,        $Str,  false, undef,
+
+        hour_size          => \my $hour_size ,         $Int,  false, undef,
+        minute_size        => \my $minute_size ,       $Int,  false, undef,
+        second_size        => \my $second_size ,       $Int,  false, undef,
+        meridian_exra      => \my $meridian_size ,     $Int,  false, undef,
+
         all_extra          => \my $all_extra,          $Str,  false, undef,
+        hour_extra         => \my $hour_extra,         $Str,  false, undef,
         minute_extra       => \my $minute_extra,       $Str,  false, undef,
         second_extra       => \my $second_extra,       $Str,  false, undef,
         meridian_exra      => \my $meridian_extra,     $Str,  false, undef,
+
+        hour_empty         => \my $hour_empty,         $Str,  false, undef,
+        minute_empty       => \my $minute_empty,       $Str,  false, undef,
+        second_empty       => \my $second_empty,       $Str,  false, undef,
+        meridian_empty     => \my $meridian_empty,     $Str,  false, undef,
+
+        field_separator    => \my $field_separator,    $Str,  false, "\n",
     );
     if(%extra) {
         warnings::warn(misc => "html_select_options: unknown option(s): "
@@ -621,11 +643,85 @@ sub html_select_time {
     require Time::Piece;
 
     # complex default values
-    # TODO
+    $time = _init_time_object($time);
 
     # build HTML
-    # TODO
-    return 'not yet implemented';
+    my @result;
+    if($display_hours) {
+        my $hour_format = $use_24_hours ? '%H' : '%I';
+
+        my @hours;
+        for my $i($use_24_hours ? (0 .. 23) : (1 .. 12)) {
+            push @hours, sprintf('%02d', $i);
+        }
+        push @result, _build_datetime_options(
+            $field_array, $prefix, 'Hour',
+            $hour_empty,
+            \@hours,
+            \@hours,
+            $time->strftime($hour_format),
+            $hour_size,
+            $all_extra,
+            $hour_extra,
+        );
+    }
+
+    if($display_minutes) {
+        my @minutes;
+        for(my $i = 0; $i < 60; $i += $minute_interval) {
+            push @minutes, sprintf('%02d', $i);
+        }
+        my $selected = sprintf '%02d',
+            int($time->day_of_month / $minute_interval) * $minute_interval;
+
+        push @result, _build_datetime_options(
+            $field_array, $prefix, 'Minute',
+            $minute_empty,
+            \@minutes,
+            \@minutes,
+            $selected,
+            $minute_size,
+            $all_extra,
+            $minute_extra,
+        );
+    }
+
+    if($display_seconds) {
+        my @seconds;
+        for(my $i = 0; $i < 60; $i += $second_interval) {
+            push @seconds, sprintf('%02d', $i);
+        }
+
+        my $selected = sprintf '%02d',
+            int($time->second / $second_interval) * $second_interval;
+        push @result, _build_datetime_options(
+            $field_array, $prefix, 'Second',
+            $second_empty,
+            \@seconds,
+            \@seconds,
+            $selected,
+            $second_size,
+            $all_extra,
+            $second_extra,
+        );
+    }
+
+    if($display_meridian && !$use_24_hours) {
+        my $meridian_format = '%p';
+
+        push @result, _build_datetime_options(
+            $field_array, $prefix, 'Meridian',
+            $meridian_empty,
+            [qw(am pm)],
+            [qw(AM PM)],
+            lc($time->strftime($meridian_format)),
+            $meridian_size,
+            $all_extra,
+            $meridian_extra,
+        );
+    }
+
+    return safe_join $field_separator, @result;
 }
 
 #sub html_table
