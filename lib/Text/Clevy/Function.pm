@@ -6,20 +6,27 @@ use Any::Moose '::Util::TypeConstraints';
 use Config::Tiny ();
 use File::Spec;
 
+use Scalar::Util qw(
+    blessed
+    looks_like_number
+);
+
 use Text::Xslate::Util qw(
     p any_in literal_to_value
     mark_raw html_escape
 );
 
 use Text::Clevy::Util qw(
-    join_html make_tag
+    safe_join safe_cat
+    make_tag
     true false
 );
 
-my $Array      = subtype __PACKAGE__ . '.Array', as 'ArrayRef';
 my $Bool       = subtype __PACKAGE__ . '.Bool',  as 'Bool';
 my $Str        = subtype __PACKAGE__ . '.Str',   as 'Str|Object';
-my $ListLike   = subtype __PACKAGE__ . '.List',  as "ArrayRef|$Str";
+my $Int        = subtype __PACKAGE__ . '.Int',   as 'Int';
+my $Array      = subtype __PACKAGE__ . '.Array', as 'ArrayRef';
+my $ListLike   = subtype __PACKAGE__ . '.List',  as "$Array|$Str";
 my $AssocArray = subtype __PACKAGE__ . '.AssocArray', as 'ArrayRef|HashRef';
 
 require Text::Clevy;
@@ -234,7 +241,7 @@ sub html_checkboxes {
     for(my $i = 0; $i < @{$values}; $i++) {
         my $value = $values->[$i];
 
-        my $input = join_html('', make_tag(
+        my $input = safe_cat(make_tag(
                 input => undef,
                 type  => 'checkbox',
                 name  => $name,
@@ -246,9 +253,9 @@ sub html_checkboxes {
 
         $input = make_tag(label => $input) if $labels;
 
-        push @result, join_html('', $input, $separator);
+        push @result, safe_cat( $input, $separator);
     }
-    return join_html("\n", @result);
+    return safe_join("\n", @result);
 }
 
 sub html_image {
@@ -312,7 +319,7 @@ sub _build_options {
             my($v, $l) = _split_assoc_array($label);
             my @group = _build_options($v, $l, $selected);
             push @result, make_tag(
-                optgroup => join_html("\n", "", @group, ""),
+                optgroup => safe_join("\n", "", @group, ""),
                 label    => $value,
             );
 
@@ -347,13 +354,13 @@ sub html_options {
 
     if(defined $name) {
         return make_tag(
-            select => join_html("\n", '', @result, ''),
+            select => safe_join("\n", '', @result, ''),
             name   => $name,
             @extra,
         );
     }
     else {
-        return join_html("\n", @result);
+        return safe_join("\n", @result);
     }
 }
 
@@ -386,9 +393,9 @@ sub html_radios {
         my $value = $values->[$i];
         my $label = $output->[$i];
 
-        my $id = join_html '_', $name, $value;
+        my $id = safe_join '_', $name, $value;
 
-        my $radio = join_html '', make_tag(
+        my $radio = safe_cat make_tag(
             input  => undef,
             type   => 'radio',
             name   => $name,

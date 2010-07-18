@@ -5,7 +5,8 @@ use warnings;
 use parent qw(Exporter);
 
 our @EXPORT_OK = qw(
-    join_html
+    safe_join
+    safe_cat
     make_tag
     true
     false
@@ -37,9 +38,15 @@ sub make_tag {
     }
 }
 
-sub join_html {
+sub safe_join {
     my $sep = shift;
-    return mark_raw join $sep, map { html_escape($_) } @_;
+    return mark_raw join html_escape($sep)->as_string,
+        map { html_escape($_)->as_string } @_;
+}
+
+sub safe_cat {
+    return mark_raw join '',
+        map { html_escape($_)->as_string } @_;
 }
 
 1;

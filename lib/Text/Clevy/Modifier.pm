@@ -7,7 +7,8 @@ use List::Util qw(min);
 use Text::Xslate::Util qw(p html_escape mark_raw);
 
 use Text::Clevy::Util qw(
-    join_html
+    safe_join
+    safe_cat
     true false
 );
 
@@ -51,8 +52,7 @@ sub capitalize {
 }
 
 sub cat {
-    my(@args) = @_;
-    return join_html '', @args;
+    return safe_cat(@_);
 }
 
 sub count_characters {
@@ -173,7 +173,7 @@ sub lower {
 
 sub nl2br {
     my($str) = @_;
-    return join_html mark_raw("<br />"),
+    return safe_join mark_raw("<br />"),
         split /\n/, $str, -1;
 }
 
@@ -192,7 +192,7 @@ sub replace {
 sub spacify {
     my($str, $padding) = @_;
     $padding = ' ' if not defined $padding;
-    return join_html $padding, split //, $str;
+    return safe_join $padding, split //, $str;
 }
 
 sub string_format {
@@ -267,7 +267,7 @@ sub wordwrap {
             push @lines, $line;
         }
 
-        return join_html($break, @lines);
+        return safe_join($break, @lines);
     }
     else { # force wrapping mode
         $length--; # What's it???
