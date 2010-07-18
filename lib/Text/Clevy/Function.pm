@@ -406,16 +406,163 @@ sub html_radios {
         ), $label;
         $radio = make_tag(label => $radio, for   => $id);
         if(length $separator) {
-            $radio = join_html '', $radio, $separator;
+            $radio = safe_cat $radio, $separator;
         }
 
         push @result, $radio;
     }
 
-    return join_html "\n", @result;
+    return safe_join "\n", @result;
 }
 
-#sub html_select_date
+sub _build_date_options {
+    my($field_array, $prefix, $moniker, $empty, $values_ref, $names_ref, @extra) = @_;
+
+    my $name = defined($field_array)
+        ? safe_cat( $field_array, '[', $prefix, $moniker, ']')
+        : safe_cat( $prefix, $moniker);
+
+    if(defined $empty) {
+        $names_ref  = [$empty, @{$names_ref}];
+        $values_ref = [q{},    @{$values_ref}];
+    }
+
+    my $options = html_options(
+        values => $values_ref,
+        output => $names_ref,
+        @extra,
+    );
+    return make_tag(
+        select => safe_cat("\n", $options, "\n"),
+        name   => $name,
+    );
+}
+
+sub html_select_date {
+    my %extra = _parse_args(
+        {@_},
+        prefix             => \my $prefix,             $Str,  false, 'Date_',
+        time               => \my $time,               $Str,  false, undef,
+        start_year         => \my $start_year,         $Str,  false, undef,
+        end_year           => \my $end_year,           $Str,  false, undef,
+        display_days       => \my $display_days,       $Bool, false, true,
+        display_months     => \my $display_months,     $Bool, false, true,
+        display_years      => \my $display_years,      $Bool, false, true,
+        month_format       => \my $month_format,       $Str,  false, '%B',
+        day_format         => \my $day_format,         $Str,  false, '%02d',
+        day_value_format   => \my $day_value_format,   $Str,  false, '%d',
+        year_as_text       => \my $year_as_text,       $Bool, false, false,
+        reverse_years      => \my $reverse_years,      $Bool, false, false,
+        field_array        => \my $field_array,        $Str,  false, undef,
+        day_size           => \my $day_size,           $Int,  false, undef,
+        month_size         => \my $month_size,         $Int,  false, undef,
+        year_size          => \my $year_size,          $Int,  false, undef,
+        all_extra          => \my $all_extra,          $Str,  false, undef,
+        day_extra          => \my $day_extra,          $Str,  false, undef,
+        month_extra        => \my $month_extra,        $Str,  false, undef,
+        year_extra         => \my $year_extra,         $Str,  false, undef,
+        field_order        => \my $field_order,        $Str,  false, 'MDY',
+        field_separator    => \my $field_separator,    $Str,  false, "\n",
+        month_value_format => \my $month_value_format, $Str,  false, '%m',
+        year_empty         => \my $year_empty,         $Str,  false, undef,
+        month_empty        => \my $month_empty,        $Str,  false, undef,
+        day_empty          => \my $day_empty,          $Str,  false, undef,
+    );
+    if(%extra) {
+        warnings::warn(misc => "html_select_options: unknown option(s): "
+            . join ", ", sort keys %extra);
+    }
+
+    require Time::Piece;
+
+    # complex default values
+    if(not defined $time) {
+        $time = time;
+    }
+
+    if(!(blessed($time) && $time->can('year'))) {
+        if(looks_like_number($time)) {
+            $time = Time::Piece->new($time);
+        }
+        else {
+            # YYY-MM-DD style timestamp
+            $time = Time::Piece->strptime($time, q{%Y-%m-%d});
+        }
+    }
+    if(not defined $start_year) {
+        $start_year = $time->year;
+    }
+    elsif($start_year =~ /\A [+-]/xms) {
+        $start_year = $time->year + $start_year; # relative
+    }
+
+    if(not defined $end_year) {
+        $end_year = $start_year;
+    }
+    elsif($end_year =~ /\A [+-]/xms) {
+        $end_year = $time->year + $end_year; # relative
+    }
+    # build HTML
+    my %result;
+
+    if($display_months) {
+        my @names;
+        my @values;
+        for my $m(1 .. 12) {
+            my $t = Time::Piece->strptime($m, '%m');
+            push @names,  $t->strftime($month_format);
+            push @values, $t->strftime($month_value_format);
+        }
+        my @extra; # TODO
+
+        $result{M} = _build_date_options(
+            $field_array, $prefix, 'Month',
+            $month_empty,
+            \@values,
+            \@names,
+            @extra,
+        );
+    }
+
+    if($display_days) {
+        my @days;
+        my @dayvals;
+        for my $d(1 .. 31) {
+            push @days,    sprintf($day_format, $d);
+            push @dayvals, sprintf($day_value_format, $d);
+        }
+        my @extra; # TODO
+
+        $result{D} = _build_date_options(
+            $field_array, $prefix, 'Day',
+            $month_empty,
+            \@dayvals,
+            \@days,
+            @extra,
+        );
+    }
+
+    if($display_years) {
+        my @years = ($start_year .. $end_year);
+        if($reverse_years) {
+            @years = reverse @years;
+        }
+        my @extra; # TODO
+
+        $result{Y} = _build_date_options(
+            $field_array, $prefix, 'Year',
+            $year_empty,
+            \@years,
+            \@years,
+            @extra,
+        );
+    }
+
+
+    my @order = split //, uc $field_order;
+    return safe_join "\n", grep { defined } @result{@order};
+}
+
 #sub html_select_time
 #sub html_table
 #sub mailto
