@@ -139,10 +139,10 @@ around led_dot => sub {
 
 # variable modifiers
 # expr | modifier : param1 : param2 ...
-sub led_pipe {
-    my($parser, $symbol, $left) = @_;
+around led_pipe => sub {
+    my($super, $parser, $symbol, $left) = @_;
 
-    my $bar = $parser->SUPER::led_pipe($symbol, $left);
+    my $bar = $parser->$super($symbol, $left);
 
     my @args;
     while($parser->token->id eq ':') {
@@ -152,7 +152,7 @@ sub led_pipe {
     }
     push @{$bar->second}, @args;
     return $bar;
-}
+};
 
 sub attr_list {
     my($parser) = @_;
