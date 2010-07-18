@@ -69,9 +69,20 @@ sub count_characters {
     return length($str);
 }
 
-#sub count_paragraphs
-#sub count_sentences
-#sub count_words
+sub count_paragraphs {
+    my($str) = @_;
+    return scalar $str =~ s/([\r\n]+)/$1/xmsg;
+}
+
+sub count_sentences {
+    my($str) = @_;
+    return scalar $str =~ s/(\S \.) (?!\w)/$1/xmsg;
+}
+
+sub count_words {
+    my($str) = @_;
+    return scalar $str =~ s/(\S+)/$1/xmsg;
+}
 
 sub date_format {
     my($time, $format, $default) = @_;

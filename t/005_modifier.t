@@ -36,6 +36,20 @@ T
     33
 X
 
+    [<<'T', {value => <<'V'}, <<'X'],
+    {$value|count_paragraphs}
+    {$value|count_sentences}
+    {$value|count_words}
+T
+War Dims Hope for Peace. Child's Death Ruins Couple's Holiday.
+
+Man is Fatally Slain. Death Causes Loneliness, Feeling of Isolation.
+V
+    2
+    4
+    20
+X
+
     [<<'T', {value => q{'Stiff Opposition Expected to Casketless Funeral Plan'} }, <<'X'],
     {$value|escape}
     {$value|escape:'html'}
