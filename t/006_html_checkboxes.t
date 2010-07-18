@@ -71,13 +71,6 @@ T
 <input type="checkbox" name="id" value="102" />Jane<br />
 X
 
-    [<<'T', { cust_ids => ["<100>", "<101>"], cust_names => [qw(<Joe> <Jack>)], customer_id => "<100>"  }, <<'X', 'auto escape'],
-{html_checkboxes name='<id>' values=$cust_ids output=$cust_names
-   selected=$customer_id  separator='<br />'}
-T
-<label><input type="checkbox" name="&lt;id&gt;" value="&lt;100&gt;" checked="checked" />&lt;Joe&gt;</label><br />
-<label><input type="checkbox" name="&lt;id&gt;" value="&lt;101&gt;" />&lt;Jack&gt;</label><br />
-X
 
     [<<'T', { cust => [[100, 'Joe'], [101, 'Jack']], customer_id => 100  }, <<'X', 'options'],
 {html_checkboxes name='id' options=$cust selected=$customer_id}

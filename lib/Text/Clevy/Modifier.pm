@@ -3,8 +3,14 @@ use strict;
 use warnings;
 
 use Time::Piece ();
+use List::Util qw(min);
 
 use Text::Xslate::Util qw(p html_escape mark_raw);
+
+use Text::Clevy::Util qw(
+    join_html
+    true false
+);
 
 require Text::Clevy;
 our $EngineClass = 'Text::Clevy';
@@ -161,11 +167,8 @@ sub lower {
 
 sub nl2br {
     my($str) = @_;
-    return mark_raw(
-        join "<br />",
-            map { html_escape($_)->as_string() }
-                split /\n/, $str, -1
-    );
+    return join_html mark_raw("<br />"),
+        split /\n/, $str, -1;
 }
 
 sub regex_replace {
@@ -191,15 +194,81 @@ sub string_format {
     return sprintf $format, $str;
 }
 
-#sub strip
-#sub strip_tags
-#sub truncate
+sub strip {
+    my($str, $space) = @_;
+    $space = ' ' if not defined $space;
+    $str =~ s/\s+/$space/g;
+    return $str;
+}
+
+sub strip_tags {
+    my($str, $replace_with_space) = @_;
+    $replace_with_space = 1 if not defined $replace_with_space;
+    my $replace = $replace_with_space ? ' ' : '';
+    $str =~ s{ < [^>]* > }{$replace}xmsg;
+    return $str;
+}
+
+sub truncate {
+    my($str, $length, $etc, $break_words, $middle) = @_;
+    $length = 80    if not defined $length;
+    $etc    = '...' if not defined $etc;
+
+    if(length($str) <= $length) {
+        return $str;
+    }
+
+    $length -= min($length, length($etc));
+
+    if (!$middle) {
+        if(!$break_words) {
+            $str = substr($str, 0, $length + 1);
+            $str =~ s/ \s+? (\S+)? \z//xmsg;
+        }
+        return substr($str, 0, $length) . $etc;
+    } else {
+        return substr($str, 0, $length / 2) . $etc . substr($str, - $length / 2);
+    }
+}
 
 sub upper {
     my($str) = @_;
     return uc($str);
 }
 
-#sub wordwrap
+sub wordwrap {
+    my($str, $length, $break, $cut) = @_;
+    $length = 80   if not defined $length;
+    $break  = "\n" if not defined $break;
+
+    if(!$cut) {
+        my @lines;
+        my $line = '';
+        foreach my $word(split /(\s+)/, $str) {
+            if(length($line) + length($word) > $length
+                    && $word =~ /\S/) {
+                $line =~ s/ \s+ \z//xms; # chomp the last spaces
+                push @lines, $line;
+                $line = $word;
+            }
+            else {
+                $line .= $word;
+            }
+        }
+
+        if(length($line) > 0) {
+            $line =~ s/ \s+ \z//xms; # chomp the last spaces
+            push @lines, $line;
+        }
+
+        return join_html($break, @lines);
+    }
+    else { # force wrapping mode
+        $length--; # What's it???
+        $str =~ s/(.{$length})/$1$break/xmsg;
+    }
+
+    return $str;
+}
 
 1;

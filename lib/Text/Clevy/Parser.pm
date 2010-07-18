@@ -25,14 +25,14 @@ around trim_code => sub {
     $code =~ s{ \# ($SIMPLE_IDENT) \# }
               { '$clevy.config.' . $1 }xmsgeo;
 
-    return $super->($parser, $code);
+    return $parser->$super($code);
 };
 
 around split => sub {
     my($super, $parser, @args) = @_;
 
 
-    my $tokens_ref = $super->($parser, @args);
+    my $tokens_ref = $parser->$super(@args);
     for(my $i = 0; $i < @{$tokens_ref}; $i++) {
         my $t = $tokens_ref->[$i];
         # process {literal} ... {/literal}
@@ -110,8 +110,20 @@ sub nud_clevy_context {
     return $parser->call('@clevy_context');
 }
 
-sub led_dot {
-    my($parser, $symbol, $left) = @_;
+around nud_literal => sub {
+    my($super, $parser, $symbol) = @_;
+
+    my $value = $symbol->value;
+    if(defined($value) and !Scalar::Util::looks_like_number($value)) {
+        # XXX: string literals in Clevy are "raw" string
+        return $parser->call('mark_raw', $parser->$super($symbol));
+    }
+
+    return $parser->$super($symbol);
+};
+
+around led_dot => sub {
+    my($super, $parser, $symbol, $left) = @_;
 
     # special case: foo.$field
     if($parser->token->id =~ /\A \$/xms) {
@@ -122,8 +134,8 @@ sub led_dot {
         );
     }
 
-    return $parser->SUPER::led_dot($symbol, $left);
-}
+    return $parser->$super($symbol, $left);
+};
 
 # variable modifiers
 # expr | modifier : param1 : param2 ...

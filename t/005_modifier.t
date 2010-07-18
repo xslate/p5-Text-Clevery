@@ -88,24 +88,6 @@ T
 ............baz
 X
 
-    [<<'T', {value => qq{foo  bar  baz} }, <<'X'],
-    { $value | regex_replace: "[\r\n\ t]+": " " }
-    { $value | replace: "bar": "BAR" }
-    { $value | replace: "[ ]bar[ ]": "BAR" }
-T
-    foo bar baz
-    foo  BAR  baz
-    foo  bar  baz
-X
-
-    [<<'T', {value => qq{foo bar baz} }, <<'X'],
-    { $value | spacify}
-    { $value | spacify: "." }
-T
-    f o o   b a r   b a z
-    f.o.o. .b.a.r. .b.a.z
-X
-
     [<<'T', {now => $now}, sprintf <<'X', Time::Piece->new($now)->year],
     {$now|date_format:"[%Y]"}
 T
@@ -136,11 +118,100 @@ T
 foo<br />bar<br />
 X
 
+
+    [<<'T', {value => qq{foo  bar  baz} }, <<'X'],
+    { $value | regex_replace: "[\r\n\ t]+": " " }
+    { $value | replace: "bar": "BAR" }
+    { $value | replace: "[ ]bar[ ]": "BAR" }
+T
+    foo bar baz
+    foo  BAR  baz
+    foo  bar  baz
+X
+
+    [<<'T', {value => qq{foo bar baz} }, <<'X'],
+    { $value | spacify}
+    { $value | spacify: "." }
+T
+    f o o   b a r   b a z
+    f.o.o. .b.a.r. .b.a.z
+X
+
     [<<'T', {value => 3.14}, <<'X'],
     {$value|string_format: '[%d]'}
 T
     [3]
 X
+
+    [<<'T', {value => qq{foo  bar  baz} }, <<'X'],
+    { $value | strip}
+    { $value | strip: "." }
+T
+    foo bar baz
+    foo.bar.baz
+X
+
+    [<<'T', {value => q{Blind Woman Gets <font face="helvetica">New Kidney</font> from Dad she Hasn't Seen in <b>years</b>.} }, <<'X'],
+    { $value | strip_tags}
+    { $value | strip_tags:true}
+    { $value | strip_tags:false}
+T
+    Blind Woman Gets  New Kidney  from Dad she Hasn&apos;t Seen in  years .
+    Blind Woman Gets  New Kidney  from Dad she Hasn&apos;t Seen in  years .
+    Blind Woman Gets New Kidney from Dad she Hasn&apos;t Seen in years.
+X
+
+    [<<'T', {value => q{Two Sisters Reunite after Eighteen Years at Checkout Counter.} }, <<'X'],
+    {$value}
+    {$value|truncate}
+    {$value|truncate:30}
+    {$value|truncate:30:""}
+    {$value|truncate:30:"---"}
+    {$value|truncate:30:"":true}
+    {$value|truncate:30:"...":true}
+    {$value|truncate:30:'..':true:true}
+T
+    Two Sisters Reunite after Eighteen Years at Checkout Counter.
+    Two Sisters Reunite after Eighteen Years at Checkout Counter.
+    Two Sisters Reunite after...
+    Two Sisters Reunite after
+    Two Sisters Reunite after---
+    Two Sisters Reunite after Eigh
+    Two Sisters Reunite after E...
+    Two Sisters Re..ckout Counter.
+X
+
+    [<<'T', {value => q{Blind woman gets new kidney from dad she hasn't seen in years.} }, <<'X'],
+{$value}
+
+{$value|wordwrap:30}
+
+{$value|wordwrap:20}
+
+{$value|wordwrap:30:"<br />\n"}
+
+{$value|wordwrap:26:"\n":true}
+T
+Blind woman gets new kidney from dad she hasn&apos;t seen in years.
+
+Blind woman gets new kidney
+from dad she hasn&apos;t seen in
+years.
+
+Blind woman gets new
+kidney from dad she
+hasn&apos;t seen in
+years.
+
+Blind woman gets new kidney<br />
+from dad she hasn&apos;t seen in<br />
+years.
+
+Blind woman gets new kidn
+ey from dad she hasn&apos;t se
+en in years.
+X
+
 
     [<<'T', {a => "foo", b => "FOO" }, <<'X'],
     {$a|upper}

@@ -54,9 +54,9 @@ T
 X
 
     [<<'T', { ids => [qw(<100> <101>)], names => [qw(<Joe> <Jack>)], sel => '<101>'  }, <<'X', 'escape html'],
-{html_options name="<foo>" values=$ids output=$names selected=$sel}
+{html_options name="foo" values=$ids output=$names selected=$sel}
 T
-<select name="&lt;foo&gt;">
+<select name="foo">
 <option value="&lt;100&gt;">&lt;Joe&gt;</option>
 <option value="&lt;101&gt;" selected="selected">&lt;Jack&gt;</option>
 </select>

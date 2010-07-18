@@ -11,6 +11,11 @@ use Text::Xslate::Util qw(
     mark_raw html_escape
 );
 
+use Text::Clevy::Util qw(
+    join_html make_tag
+    true false
+);
+
 *_find_type = any_moose('::Util::TypeConstraints')
     ->can('find_or_create_isa_type_constraint');
 
@@ -44,8 +49,6 @@ my @functions = map { $_ => __PACKAGE__->can($_) || _make_not_impl($_) } qw(
     pupup_init
     textformat
 );
-
-use constant { true => 1, false => 0 };
 
 sub get_table { @functions }
 
@@ -86,29 +89,6 @@ sub config_load {
     return '';
 }
 
-# for HTML components
-sub _tag {
-    my $name    = shift;
-    my $content = shift;
-    my $attrs = '';
-    while(my($name, $value) = splice @_, 0, 2) {
-        if(defined $value) {
-            $attrs .= sprintf q{ %s="%s"}, html_escape($name), html_escape($value);
-        }
-    }
-    if(defined $content) {
-        return mark_raw(sprintf q{<%1$s%2$s>%3$s</%1$s>}, $name, $attrs, html_escape($content));
-    }
-    else {
-        return mark_raw(sprintf q{<%1$s%2$s />}, $name, $attrs);
-    }
-}
-
-sub _join_html {
-    my $sep = shift;
-    return mark_raw join $sep, map { html_escape($_) } @_;
-}
-
 sub _parse_args {
     my $args = shift;
     if(@_ % 5) {
@@ -125,9 +105,6 @@ sub _parse_args {
             _required($name, 1);
         }
         else {
-#            ${$var_ref} = ref($default) eq 'CODE'
-#                ? $default->()
-#                : $default;
             ${$var_ref} = $default;
         }
     }
@@ -158,12 +135,12 @@ sub html_checkboxes {
     my @extra = _parse_args(
         {@_},
         # name => var_ref, type, required, default
-        name      => \my $name,      'Str',              false, 'checkbox',
+        name      => \my $name,      'Defined',          false, 'checkbox',
         values    => \my $values,    'ArrayRef' ,        undef, undef,
         output    => \my $output,    'ArrayRef',         undef, undef,
-        selected  => \my $selected,  'Str|ArrayRef',     false, [],
+        selected  => \my $selected,  'Defined|ArrayRef', false, [],
         options   => \my $options,   'ArrayRef|HashRef', undef, undef,
-        separator => \my $separator, 'Str',              false, q{},
+        separator => \my $separator, 'Defined',          false, q{},
         labels    => \my $labels,    'Bool',             false, true,
     );
 
@@ -179,13 +156,11 @@ sub html_checkboxes {
         $selected = [$selected];
     }
 
-    $separator = mark_raw($separator);
-
     my @result;
     for(my $i = 0; $i < @{$values}; $i++) {
         my $value = $values->[$i];
 
-        my $input = _join_html('', _tag(
+        my $input = join_html('', make_tag(
                 input => undef,
                 type  => 'checkbox',
                 name  => $name,
@@ -195,25 +170,25 @@ sub html_checkboxes {
             ), html_escape($output->[$i])),
         ;
 
-        $input = _tag(label => $input) if $labels;
+        $input = make_tag(label => $input) if $labels;
 
-        push @result, _join_html('', $input, $separator);
+        push @result, join_html('', $input, $separator);
     }
-    return _join_html("\n", @result);
+    return join_html("\n", @result);
 }
 
 sub html_image {
     my @extra = _parse_args(
         {@_},
         # name => var_ref, type, required, default
-        file    => \my $file,    'Str', true,  undef,
-        height  => \my $height,  'Str', false, undef,
-        width   => \my $width,   'Str', false, undef,
-        basedir => \my $basedir, 'Str', false, q{},
-        alt     => \my $alt,     'Str', false, q{},
-        href    => \my $href,    'Str', false, undef,
+        file    => \my $file,    'Defined', true,  undef,
+        height  => \my $height,  'Defined', false, undef,
+        width   => \my $width,   'Defined', false, undef,
+        basedir => \my $basedir, 'Defined', false, q{},
+        alt     => \my $alt,     'Defined', false, q{},
+        href    => \my $href,    'Defined', false, undef,
         path_prefix
-                => \my $path_prefix, 'Str', false, '',
+                => \my $path_prefix, 'Defined', false, '',
     );
 
 
@@ -230,7 +205,7 @@ sub html_image {
         };
     }
 
-    my $img = _tag(
+    my $img = make_tag(
         img    => undef,
         src    => $path_prefix . $file,
         alt    => $alt,
@@ -239,7 +214,7 @@ sub html_image {
         @extra,
     );
     if(defined $href) {
-        $img = _tag(a => $img, href => $href);
+        $img = make_tag(a => $img, href => $href);
     }
     return $img;
 }
@@ -252,7 +227,7 @@ sub _build_options {
         my $label = $labels->[$i];
 
         if(!(ref($label) eq 'ARRAY' or ref($label) eq 'HASH')) {
-            push @result, _tag(
+            push @result, make_tag(
                 option => $label,
                 # label => $label,
                 value  => $value,
@@ -262,8 +237,8 @@ sub _build_options {
         else {
             my($v, $l) = _split_assoc_array($label);
             my @group = _build_options($v, $l, $selected);
-            push @result, _tag(
-                optgroup => _join_html("\n", "", @group, ""),
+            push @result, make_tag(
+                optgroup => join_html("\n", "", @group, ""),
                 label    => $value,
             );
 
@@ -277,9 +252,9 @@ sub html_options {
         {@_},
         values   => \my $values,   'ArrayRef',         undef, undef,
         output   => \my $output,   'ArrayRef',         undef, undef,
-        selected => \my $selected, 'Str|ArrayRef',     false, [],
+        selected => \my $selected, 'Defined|ArrayRef', false, [],
         options  => \my $options,  'ArrayRef|HashRef', undef, undef,
-        name     => \my $name,     'Str',              false, undef,
+        name     => \my $name,     'Defined',          false, undef,
     );
 
     if(defined $options) {
@@ -297,14 +272,14 @@ sub html_options {
     my @result = _build_options($values, $output, $selected);
 
     if(defined $name) {
-        return _tag(
-            select => _join_html("\n", '', @result, ''),
+        return make_tag(
+            select => join_html("\n", '', @result, ''),
             name   => $name,
             @extra,
         );
     }
     else {
-        return _join_html("\n", @result);
+        return join_html("\n", @result);
     }
 }
 

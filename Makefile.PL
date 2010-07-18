@@ -9,7 +9,7 @@ requires 'Text::Xslate'   => 0.1047;
 requires 'Config::Tiny'   => 2.12;
 requires 'Plack'          => 0.9938;
 requires 'Image::Size'    => 3.221;
-requries 'HTML::Entities' => 1.35;
+requires 'HTML::Entities' => 1.35;
 requires 'URI::Escape'    => 3.30;
 
 test_requires 'Test::More' => 0.88; # done_testing()
