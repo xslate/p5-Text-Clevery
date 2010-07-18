@@ -84,6 +84,9 @@ sub init_symbols {
     $parser->symbol('$clevy') ->set_nud(\&nud_clevy_context);
     $parser->symbol('$smarty')->set_nud(\&nud_clevy_context);
 
+    $parser->define_literal(ldelim => $parser->tag_start);
+    $parser->define_literal(rdelim => $parser->tag_end);
+
     # statement tokens
     $parser->symbol('if')    ->set_std(\&std_if);
     $parser->symbol('elseif')->is_block_end(1);

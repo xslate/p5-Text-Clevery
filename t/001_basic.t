@@ -58,6 +58,12 @@ T
 { $now->year() -}
 T
 
+    [<<'T', {lang => 'Clevy' }, <<'X'],
+Hello, {ldelim}{$lang}{rdelim} world!
+T
+Hello, {Clevy} world!
+X
+
     [<<'T', {lang => 'Clevy'}, <<'X'],
 Hello, {* this is a comment *}{$lang}{* this is another comment *} world!
 T
