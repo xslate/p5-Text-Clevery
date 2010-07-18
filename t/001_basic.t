@@ -161,6 +161,42 @@ T
     33
 X
 
+    [<<'T', {value => q{'Stiff Opposition Expected to Casketless Funeral Plan'} }, <<'X'],
+    {$value|escape}
+    {$value|escape:'html'}
+    {$value|escape:'htmlall'}
+    {$value|escape:'url'}
+    {$value|escape:'quotes'}
+T
+    &apos;Stiff Opposition Expected to Casketless Funeral Plan&apos;
+    &apos;Stiff Opposition Expected to Casketless Funeral Plan&apos;
+    &#39;Stiff Opposition Expected to Casketless Funeral Plan&#39;
+    %27Stiff%20Opposition%20Expected%20to%20Casketless%20Funeral%20Plan%27
+    \'Stiff Opposition Expected to Casketless Funeral Plan\'
+X
+
+    [<<'T', {value => q{smarty@example.com} }, <<'X'],
+    { $value | escape:"hex" }
+    { $value | escape:"hexentity" }
+    { $value | escape:"mail" }
+T
+    %73%6d%61%72%74%79%40%65%78%61%6d%70%6c%65%2e%63%6f%6d
+    &#x73;&#x6d;&#x61;&#x72;&#x74;&#x79;&#x40;&#x65;&#x78;&#x61;&#x6d;&#x70;&#x6c;&#x65;&#x2e;&#x63;&#x6f;&#x6d;
+    smarty [AT] example [DOT] com
+X
+
+    [<<'T', {now => $now}, sprintf <<'X', Time::Piece->new($now)->year],
+    {$now|date_format:"[%Y]"}
+T
+    [%s]
+X
+
+    [<<'T', {value => qq{"foo", </script>\r\n} }, <<'X'],
+    { $value | escape:"javascript" }
+T
+    \"foo\", <\/script>\r\n
+X
+
     [<<'T', {now => $now}, sprintf <<'X', Time::Piece->new($now)->year],
     {$now|date_format:"[%Y]"}
 T
