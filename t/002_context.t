@@ -81,6 +81,12 @@ T
 {foo}
 X
 
+    [<<'T', { }, <<'X'],
+{$smarty.template}
+T
+&lt;string&gt;
+X
+
 );
 
 for my $d(@set) {

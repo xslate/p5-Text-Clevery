@@ -108,7 +108,7 @@ has template => (
     isa => 'Str',
 
     lazy    => 1,
-    default => sub { Text::Xslate->get_current_template_name() },
+    default => sub { Text::Xslate->current_file() },
 );
 
 sub ldelim {

@@ -56,7 +56,7 @@ sub render {
 }
 
 sub get_current_context {
-    my $self = __PACKAGE__->engine()
+    my $self = __PACKAGE__->current_engine()
         or Carp::confess("Cannot get clevy context outside render()");
     return $self->{clevy_context} ||= Text::Clevy::Context->new(
             @{$self->{clevy_context_args}},
