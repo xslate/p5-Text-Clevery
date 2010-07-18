@@ -39,10 +39,10 @@ T
 Hello, Clevy world!
 X
 
-    [<<'T', {h => { lang => 'Clevy' }, f => 'lang' }, <<'X'],
-Hello, {$h[$f]} world!
+    [<<'T', { x => 32 }, <<'X'],
+    {$x + 10}
 T
-Hello, Clevy world!
+    42
 X
 
     [<<'T', {now => Time::Piece->new($now)}, Time::Piece->new($now)->year, 'dot field'],
