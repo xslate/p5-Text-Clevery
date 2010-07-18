@@ -53,7 +53,7 @@ sub capitalize {
 
 sub cat {
     my(@args) = @_;
-    return join q{}, @args;
+    return join_html '', @args;
 }
 
 sub count_characters {
@@ -192,7 +192,7 @@ sub replace {
 sub spacify {
     my($str, $padding) = @_;
     $padding = ' ' if not defined $padding;
-    return join $padding, split //, $str;
+    return join_html $padding, split //, $str;
 }
 
 sub string_format {

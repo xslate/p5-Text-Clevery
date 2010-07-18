@@ -23,9 +23,11 @@ T
 X
 
     [<<'T', {value => "foo"}, <<'X'],
-<em>{$value|cat:"bar"}</em>
+    <em>{$value|cat:"bar"}</em>
+    {$value|cat: "<br />"}
 T
-<em>foobar</em>
+    <em>foobar</em>
+    foo<br />
 X
 
     [<<'T', {value => "Cold Wave Linked to Temperatures."}, <<'X'],
