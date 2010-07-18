@@ -4,7 +4,9 @@ use 5.008_001;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.0001';
+
+sub smarty_compatible_version { '2.6' }
 
 use parent qw(Text::Xslate);
 

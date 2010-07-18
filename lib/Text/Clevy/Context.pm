@@ -2,8 +2,6 @@ package Text::Clevy::Context;
 use Any::Moose;
 use Plack::Request;
 
-my $smarty_compat_version = '2.6';
-
 has _engine => (
     is  => 'ro',
     isa => 'Object',
@@ -123,7 +121,7 @@ sub rdelim {
 
 sub server { shift()->env }
 
-sub version { $smarty_compat_version }
+sub version { Text::Clevy->smarty_compatible_version }
 
 sub now { time }
 

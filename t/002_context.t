@@ -87,6 +87,12 @@ T
 &lt;string&gt;
 X
 
+    [<<'T', { }, <<'X'],
+{if $smarty.version >= 2.6 }version ok{else}unlikely{/if}
+T
+version ok
+X
+
 );
 
 for my $d(@set) {
