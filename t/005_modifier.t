@@ -72,6 +72,24 @@ T
     \"foo\", <\/script>\r\n
 X
 
+    [<<'T', {value => qq{foo\nbar\nbaz\n} }, <<'X'],
+{ $value | indent -}
+{ $value | indent: 8 -}
+{ $value | indent: 12: '.' -}
+T
+    foo
+    bar
+    baz
+        foo
+        bar
+        baz
+............foo
+............bar
+............baz
+X
+
+
+
     [<<'T', {now => $now}, sprintf <<'X', Time::Piece->new($now)->year],
     {$now|date_format:"[%Y]"}
 T

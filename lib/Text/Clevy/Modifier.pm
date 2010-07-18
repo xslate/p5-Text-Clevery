@@ -144,7 +144,15 @@ sub escape {
     return mark_raw($value);
 }
 
-#sub indent
+sub indent {
+    my($str, $count, $padding) = @_;
+    $count   = 4   if not defined $count;
+    $padding = ' ' if not defined $padding;
+
+    $padding x= $count;
+    $str =~ s/^/$padding/xmsg;
+    return $str;
+}
 
 sub lower {
     my($str) = @_;
