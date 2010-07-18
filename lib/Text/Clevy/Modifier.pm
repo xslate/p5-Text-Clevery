@@ -15,7 +15,7 @@ use Text::Clevy::Util qw(
 require Text::Clevy;
 our $EngineClass = 'Text::Clevy';
 
-my @modifiers = map { $_ => __PACKAGE__->can($_) || _make_not_impl($_) } qw(
+my @modifiers = map { $_ => __PACKAGE__->can($_) || die $_ } qw(
     capitalize
     cat
     count_characters
@@ -40,11 +40,6 @@ my @modifiers = map { $_ => __PACKAGE__->can($_) || _make_not_impl($_) } qw(
 );
 
 sub get_table { @modifiers }
-
-sub _make_not_impl {
-    my($name) = @_;
-    return sub { die "Modifier $name is not implemented.\n" };
-}
 
 sub capitalize {
     my($str, $number_as_word) = @_;
