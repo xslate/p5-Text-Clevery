@@ -114,7 +114,7 @@ This document describes Text::Clevy version 0.01.
         lang => 'Smarty',
     );
 
-    # pass PSGI environment as 'env'
+    # pass a PSGI request as 'env'
     my $psgi_env = {};
     print $tc->render_string('Hello, {$lang} world!',
         \%vars, env => $psgi_env);
@@ -126,26 +126,14 @@ This document describes Text::Clevy version 0.01.
 
 =head1 DESCRIPTION
 
-Text::Clevy provides blah blah blah.
+Text::Clevy is a Smarty compatible template engine implemented
+on Xslate.
+
+This software is under development.
 
 =head1 INTERFACE
 
-=head2 Class methods
-
-=over 4
-
-=item *
-
-=back
-
-=head2 Instance methods
-
-=over 4
-
-=item *
-
-=back
-
+This is a subclass of Text::Xslate. See L<Text::Xslate> for details
 
 =head1 DEPENDENCIES
 
