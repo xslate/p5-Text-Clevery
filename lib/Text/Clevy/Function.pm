@@ -166,7 +166,7 @@ sub cycle {
     }
 
     if($assign) {
-        die "cycle: 'assign' option is not supported";
+        die "cycle: 'assign' is not supported";
     }
 
     my $retval = $print
@@ -360,16 +360,51 @@ sub html_options {
 sub html_radios {
     my @extra = _parse_args(
         {@_},
-        name      => \my $name,      $Str,        true, "radio",
+        name      => \my $name,      $Str,        false, "radio",
         values    => \my $values,    $Array,      undef, undef,
         output    => \my $output,    $Array,      undef, undef,
-        selected  => \my $selected,  $Str,        false, [],
+        selected  => \my $selected,  $Str,        false, q{},
         options   => \my $options,   $AssocArray, undef, undef,
         separator => \my $separator, $Str,        false, q{},
         assign    => \my $assign,    $Str,        false, q{},
     );
 
-    return ''
+    if(defined $options) {
+        ($values, $output) = _split_assoc_array($options);
+    }
+    else {
+        $values or _required('values');
+        $output or _required('output');
+    }
+
+    if($assign) {
+        die 'html_radios: "assign" is not supported';
+    }
+
+    my @result;
+    for(my $i = 0; $i < @{$values}; $i++) {
+        my $value = $values->[$i];
+        my $label = $output->[$i];
+
+        my $id = join_html '_', $name, $value;
+
+        my $radio = join_html '', make_tag(
+            input  => undef,
+            type   => 'radio',
+            name   => $name,
+            value  => $value,
+            id     => $id,
+            ($selected eq $value ? (checked => 'checked') : ()),
+        ), $label;
+        $radio = make_tag(label => $radio, for   => $id);
+        if(length $separator) {
+            $radio = join_html '', $radio, $separator;
+        }
+
+        push @result, $radio;
+    }
+
+    return join_html "\n", @result;
 }
 
 #sub html_select_date
