@@ -2,7 +2,6 @@ package Text::Clevy::Modifier;
 use strict;
 use warnings;
 
-use Time::Piece ();
 use List::Util qw(min);
 
 use Text::Xslate::Util qw(p html_escape mark_raw);
@@ -81,6 +80,7 @@ sub count_words {
 
 sub date_format {
     my($time, $format, $default) = @_;
+    require Time::Piece;
     return $time
         ? Time::Piece->new($time)->strftime($format)
         : $default;
