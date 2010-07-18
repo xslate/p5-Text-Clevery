@@ -4,19 +4,24 @@ extends 'Text::Xslate::Parser';
 
 use Text::Xslate::Util qw(p any_in);
 
-sub _build_identity_pattern { qr{ [/\$]? [a-zA-Z_][a-zA-Z0-9_]* }xms }
+sub _build_identity_pattern {
+    return qr{ (?: [/\$]? [a-zA-Z_][a-zA-Z0-9_]* ) }xms;
+}
 
 sub _build_line_start { undef  }
 sub _build_tag_start  { '{' }
 sub _build_tag_end    { '}' }
 
+# preprocess code sections
 around trim_code => sub {
     my($super, $parser, $code) = @_;
 
-    if($code =~ /\A \* .* \* \z/xms) { # comment
+    # comment
+    if($code =~ /\A \* .* \* \z/xms) {
         return '';
     }
-    elsif($code =~ /\A \# (.*) \# \z/xms) { # config
+    # config variable
+    elsif($code =~ /\A \# (.*) \# \z/xms) {
         return sprintf '$clevy.config.%s', $1;
     }
 
@@ -30,6 +35,7 @@ around split => sub {
     my $tokens_ref = $super->($parser, @args);
     for(my $i = 0; $i < @{$tokens_ref}; $i++) {
         my $t = $tokens_ref->[$i];
+        # process {literal} ... {/literal}
         if($t->[0] eq 'code' && $t->[1] =~ m{\A \s* literal \s* \z}xms) {
             my $text = '';
 
