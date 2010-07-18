@@ -98,6 +98,14 @@ T
     foo  bar  baz
 X
 
+    [<<'T', {value => qq{foo bar baz} }, <<'X'],
+    { $value | spacify}
+    { $value | spacify: "." }
+T
+    f o o   b a r   b a z
+    f.o.o. .b.a.r. .b.a.z
+X
+
     [<<'T', {now => $now}, sprintf <<'X', Time::Piece->new($now)->year],
     {$now|date_format:"[%Y]"}
 T

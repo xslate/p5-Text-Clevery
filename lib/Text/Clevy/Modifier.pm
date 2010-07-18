@@ -180,8 +180,11 @@ sub replace {
     return $str;
 }
 
-#sub replace
-#sub spacify
+sub spacify {
+    my($str, $padding) = @_;
+    $padding = ' ' if not defined $padding;
+    return join $padding, split //, $str;
+}
 
 sub string_format {
     my($str, $format) = @_;
