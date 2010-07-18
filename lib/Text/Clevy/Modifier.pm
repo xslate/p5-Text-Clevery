@@ -168,7 +168,18 @@ sub nl2br {
     );
 }
 
-#sub regex_replace
+sub regex_replace {
+    my($str, $pattern, $replace) = @_;
+    $str =~ s/$pattern/$replace/msg;
+    return $str;
+}
+
+sub replace {
+    my($str, $pattern, $replace) = @_;
+    $str =~ s/\Q$pattern\E/$replace/msg;
+    return $str;
+}
+
 #sub replace
 #sub spacify
 

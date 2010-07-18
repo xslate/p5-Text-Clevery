@@ -88,7 +88,15 @@ T
 ............baz
 X
 
-
+    [<<'T', {value => qq{foo  bar  baz} }, <<'X'],
+    { $value | regex_replace: "[\r\n\ t]+": " " }
+    { $value | replace: "bar": "BAR" }
+    { $value | replace: "[ ]bar[ ]": "BAR" }
+T
+    foo bar baz
+    foo  BAR  baz
+    foo  bar  baz
+X
 
     [<<'T', {now => $now}, sprintf <<'X', Time::Piece->new($now)->year],
     {$now|date_format:"[%Y]"}
