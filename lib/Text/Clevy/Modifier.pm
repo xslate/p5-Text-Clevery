@@ -83,39 +83,39 @@ sub default {
 
 # See smarty3/libs/plugins/modifier.escape.php
 sub escape {
-    my($value, $format, $encoding) = @_;
+    my($str, $format, $encoding) = @_;
     $format   ||= 'html';
     $encoding ||= 'ISO-8859-1';
 
     if($format eq 'html') {
-        return html_escape($value);
+        return html_escape($str);
     }
     elsif($format eq 'htmlall') {
         require HTML::Entities;
-        $value = HTML::Entities::encode($value);
+        $str = HTML::Entities::encode($str);
     }
     elsif($format eq 'url' or $format eq 'urlpathinfo') {
         require URI::Escape;
-        $value = utf8::is_utf8($value)
-            ? URI::Escape::uri_escape_utf8($value)
-            : URI::Escape::uri_escape($value);
+        $str = utf8::is_utf8($str)
+            ? URI::Escape::uri_escape_utf8($str)
+            : URI::Escape::uri_escape($str);
         if($format eq 'urlpathinfo') {
-            $value =~ s{%2F}{/}g;
+            $str =~ s{%2F}{/}g;
         }
     }
     elsif($format eq 'quotes') {
         # escapes single quotes and back slashes
-        $value =~ s{ ( [\\'] ) }{\\$1}xmsg;
+        $str =~ s{ ( [\\'] ) }{\\$1}xmsg;
     }
     elsif($format eq 'hex') {
         use bytes;
-        $value =~ s{ (.) }{ '%' . unpack('H*', $1) }xmsge;
+        $str =~ s{ (.) }{ '%' . unpack('H*', $1) }xmsge;
     }
     elsif($format eq 'hexentity') {
-        $value =~ s{ (.) }{ '&#x' . unpack('H*', $1) . ';' }xmsge;
+        $str =~ s{ (.) }{ '&#x' . unpack('H*', $1) . ';' }xmsge;
     }
     elsif($format eq 'decentity') {
-        $value =~ s{ (.) }{ '&#' . ord($1) . ';' }xmsge;
+        $str =~ s{ (.) }{ '&#' . ord($1) . ';' }xmsge;
     }
     elsif($format eq 'javascript') {
         my %map = (
@@ -127,21 +127,21 @@ sub escape {
             q{</}  => q{<\/},
         );
         my $pat = join '|', map { quotemeta } keys %map;
-        $value =~ s/($pat)/$map{$1}/xmsge;
+        $str =~ s/($pat)/$map{$1}/xmsge;
     }
     elsif($format eq 'mail') {
-        $value =~ s/\@/ [AT] /g;
-        $value =~ s/\./ [DOT] /g;
+        $str =~ s/\@/ [AT] /g;
+        $str =~ s/\./ [DOT] /g;
     }
     elsif($format eq 'nonstd') {
         use bytes;
-        $value =~ s/([^\x00-\x7d])/'&#' . ord($1) . ';'/xmsge;
-        $value = mark_raw($value);
+        $str =~ s/([^\x00-\x7d])/'&#' . ord($1) . ';'/xmsge;
+        $str = mark_raw($str);
     }
     else {
         warnings::warnif(misc => "Unknown escape format '$format' used");
     }
-    return mark_raw($value);
+    return mark_raw($str);
 }
 
 sub indent {
