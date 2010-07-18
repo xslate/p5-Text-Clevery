@@ -68,7 +68,6 @@ sub _bad_param {
     Carp::croak("InvalidValue for '$name': " . _find_type($type)->get_message($value));
 }
 
-
 sub config_load {
     my(%args) = @_;
 
@@ -88,6 +87,17 @@ sub config_load {
     }
     return '';
 }
+
+#sub php; # never implemented!
+#sub strip
+
+
+#sub assign
+#sub counter
+#sub cycle
+#sub debug
+#sub eval
+#sub fetch
 
 sub _parse_args {
     my $args = shift;
@@ -282,6 +292,16 @@ sub html_options {
         return join_html("\n", @result);
     }
 }
+
+#sub html_radios
+#sub html_select_date
+#sub html_select_time
+#sub html_table
+#sub mailto
+#sub math
+#sub popup
+#sub popup_init
+#sub textformat
 
 no Any::Moose '::Util::TypeConstraints';
 1;

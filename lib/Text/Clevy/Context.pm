@@ -101,13 +101,18 @@ has foreach => (
     default => \&_build_hashref,
 );
 
-has template => (
+has _storage => ( # per-request storage
     is  => 'ro',
-    isa => 'Str',
+    isa => 'HashRef',
 
     lazy    => 1,
-    default => sub { Text::Xslate->current_file() },
+    default => \&_build_hashref,
 );
+
+sub template {
+    my($self) = @_;
+    return $self->_engine->current_file();
+}
 
 sub ldelim {
     my($self) = @_;
