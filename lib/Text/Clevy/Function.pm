@@ -435,7 +435,7 @@ sub _init_time_object {
 sub _build_datetime_options {
     my($field_array, $prefix, $moniker,
        $empty, $values_ref, $names_ref, $selected,
-       $size, @others) = @_;
+       @others) = @_;
 
     my $name = defined($field_array)
         ? safe_cat( $field_array, '[', $prefix, $moniker, ']')
@@ -447,10 +447,6 @@ sub _build_datetime_options {
     }
 
     my @extra;
-    if(defined $size) {
-        push @extra, size => $size;
-    }
-
     foreach my $attr_pair(@others) {
         next if not defined $attr_pair;
 
@@ -459,9 +455,11 @@ sub _build_datetime_options {
         }xms;
         if($value =~ /\A " (.*) " \z/xms) {
             $value = $1;
+            $value =~ s/"/&quot;/g; # ensure " is gone
         }
         elsif($value =~ /\A ' (.*) ' \z/xms) {
             $value = $1;
+            $value =~ s/'/&apos;/g; # ensure ' is gone
         }
         push @extra, mark_raw($name) => mark_raw($value);
     }
@@ -555,7 +553,7 @@ sub html_select_date {
             \@values,
             \@names,
             $time->strftime($month_value_format),
-            $month_size,
+            (defined $month_size ? qq{size='$month_size'} : ()),
             $all_extra,
             $month_extra,
         );
@@ -574,7 +572,7 @@ sub html_select_date {
             \@dayvals,
             \@days,
             sprintf($day_value_format, $time->mday), # day of month
-            $day_size,
+            (defined $day_size ? qq{size='$day_size'} : ()),
             $all_extra,
             $day_extra,
         );
@@ -591,7 +589,7 @@ sub html_select_date {
             \@years,
             \@years,
             $time->year,
-            $year_size,
+            (defined $year_size ? qq{size='$year_size'} : ()),
             $all_extra,
             $year_extra,
         );
@@ -616,11 +614,6 @@ sub html_select_time {
         minute_interval    => \my $minute_interval,    $Int,  false, 1,
         second_interval    => \my $second_interval,    $Int,  false, 1,
         field_array        => \my $field_array,        $Str,  false, undef,
-
-        hour_size          => \my $hour_size ,         $Int,  false, undef,
-        minute_size        => \my $minute_size ,       $Int,  false, undef,
-        second_size        => \my $second_size ,       $Int,  false, undef,
-        meridian_exra      => \my $meridian_size ,     $Int,  false, undef,
 
         all_extra          => \my $all_extra,          $Str,  false, undef,
         hour_extra         => \my $hour_extra,         $Str,  false, undef,
@@ -660,7 +653,6 @@ sub html_select_time {
             \@hours,
             \@hours,
             $time->strftime($hour_format),
-            $hour_size,
             $all_extra,
             $hour_extra,
         );
@@ -680,7 +672,6 @@ sub html_select_time {
             \@minutes,
             \@minutes,
             $selected,
-            $minute_size,
             $all_extra,
             $minute_extra,
         );
@@ -700,7 +691,6 @@ sub html_select_time {
             \@seconds,
             \@seconds,
             $selected,
-            $second_size,
             $all_extra,
             $second_extra,
         );
@@ -715,7 +705,6 @@ sub html_select_time {
             [qw(am pm)],
             [qw(AM PM)],
             lc($time->strftime($meridian_format)),
-            $meridian_size,
             $all_extra,
             $meridian_extra,
         );
