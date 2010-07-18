@@ -724,7 +724,27 @@ sub html_select_time {
     return safe_join $field_separator, @result;
 }
 
-#sub html_table
+sub html_table {
+    my %extra = _parse_args(
+        {@_},
+        loop       => \my $loop,       $Array,    true,  undef,
+        cols       => \my $cols,       $ListLike, false, 3,
+        rows       => \my $rows,       $Int,      false, undef,
+        inner      => \my $innter,     $Str,      false, 'cols',
+        caption    => \my $caption,    $Str,      false, undef,
+        table_attr => \my $table_attr, $Str,      false, q{border="1"},
+        th_attr    => \my $th_attr,    $ListLike, false, undef,
+        tr_attr    => \my $tr_attr,    $ListLike, false, undef,
+        td_attr    => \my $td_attr,    $ListLike, false, undef,
+        trailpad   => \my $trailpad,   $Str,      false, mark_raw('&nbsp;'),
+        vdir       => \my $vdir,       $Str,      false, 'down',
+    );
+    if(%extra) {
+        warnings::warn(misc => "html_select_options: unknown option(s): "
+            . join ", ", sort keys %extra);
+    }
+}
+
 #sub mailto
 #sub math
 #sub popup
