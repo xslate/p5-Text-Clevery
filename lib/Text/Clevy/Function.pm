@@ -16,8 +16,11 @@ use Text::Clevy::Util qw(
     true false
 );
 
-*_find_type = any_moose('::Util::TypeConstraints')
-    ->can('find_or_create_isa_type_constraint');
+my $Array      = subtype __PACKAGE__ . '.Array', as 'ArrayRef';
+my $Bool       = subtype __PACKAGE__ . '.Bool',  as 'Bool';
+my $Str        = subtype __PACKAGE__ . '.Str',   as 'Str|Object';
+my $ListLike   = subtype __PACKAGE__ . '.List',  as "ArrayRef|$Str";
+my $AssocArray = subtype __PACKAGE__ . '.AssocArray', as 'ArrayRef|HashRef';
 
 require Text::Clevy;
 our $EngineClass = 'Text::Clevy';
@@ -65,7 +68,7 @@ sub _required {
 
 sub _bad_param {
     my($type, $name, $value) = @_;
-    Carp::croak("InvalidValue for '$name': " . _find_type($type)->get_message($value));
+    Carp::croak("InvalidValue for '$name': " . $type->get_message($value));
 }
 
 sub config_load {
@@ -100,7 +103,7 @@ sub _parse_args {
     while(my($name, $var_ref, $type, $required, $default) = splice @_, 0, 5) {
         if(defined $args->{$name}) {
             my $value = delete $args->{$name};
-            _find_type->($type)->check($value)
+            $type->check($value)
                 or _bad_param($type, $name, $value);
             ${$var_ref} = $value;
         }
@@ -122,13 +125,13 @@ sub cycle {
     my %extra = _parse_args(
         {@_},
         # name => var_ref, type, required, default
-        name      => \my $name,      'Defined',    false, 'default',
-        values    => \my $values,    'Defined',    false,  undef,
-        print     => \my $print,     'Bool',       false, true,
-        advance   => \my $advance,   'Bool',       false, true,
-        delimiter => \my $delimiter, 'Defined',    false, ',',
-        assign    => \my $assign,    'Defined',    false, undef,
-        reset     => \my $reset,     'Bool',       false, false,
+        name      => \my $name,      $Str,      false, 'default',
+        values    => \my $values,    $ListLike, false,  undef,
+        print     => \my $print,     $Bool,     false, true,
+        advance   => \my $advance,   $Bool,     false, true,
+        delimiter => \my $delimiter, $Str,      false, ',',
+        assign    => \my $assign,    $Str,      false, undef,
+        reset     => \my $reset,     $Bool,     false, false,
     );
     if(%extra) {
         warnings::warn(misc => "cycle: unknown option(s): "
@@ -206,13 +209,13 @@ sub html_checkboxes {
     my @extra = _parse_args(
         {@_},
         # name => var_ref, type, required, default
-        name      => \my $name,      'Defined',          false, 'checkbox',
-        values    => \my $values,    'ArrayRef' ,        undef, undef,
-        output    => \my $output,    'ArrayRef',         undef, undef,
-        selected  => \my $selected,  'Defined|ArrayRef', false, [],
-        options   => \my $options,   'ArrayRef|HashRef', undef, undef,
-        separator => \my $separator, 'Defined',          false, q{},
-        labels    => \my $labels,    'Bool',             false, true,
+        name      => \my $name,      $Str,        false, 'checkbox',
+        values    => \my $values,    $Array,      undef, undef,
+        output    => \my $output,    $Array,      undef, undef,
+        selected  => \my $selected,  $ListLike,   false, [],
+        options   => \my $options,   $AssocArray, undef, undef,
+        separator => \my $separator, $Str,        false, q{},
+        labels    => \my $labels,    $Bool,       false, true,
     );
 
     if(defined $options) {
@@ -252,14 +255,14 @@ sub html_image {
     my @extra = _parse_args(
         {@_},
         # name => var_ref, type, required, default
-        file    => \my $file,    'Defined', true,  undef,
-        height  => \my $height,  'Defined', false, undef,
-        width   => \my $width,   'Defined', false, undef,
-        basedir => \my $basedir, 'Defined', false, q{},
-        alt     => \my $alt,     'Defined', false, q{},
-        href    => \my $href,    'Defined', false, undef,
+        file    => \my $file,    $Str, true,  undef,
+        height  => \my $height,  $Str, false, undef,
+        width   => \my $width,   $Str, false, undef,
+        basedir => \my $basedir, $Str, false, q{},
+        alt     => \my $alt,     $Str, false, q{},
+        href    => \my $href,    $Str, false, undef,
         path_prefix
-                => \my $path_prefix, 'Defined', false, '',
+                => \my $path_prefix, $Str, false, '',
     );
 
 
@@ -321,11 +324,11 @@ sub _build_options {
 sub html_options {
     my @extra = _parse_args(
         {@_},
-        values   => \my $values,   'ArrayRef',         undef, undef,
-        output   => \my $output,   'ArrayRef',         undef, undef,
-        selected => \my $selected, 'Defined|ArrayRef', false, [],
-        options  => \my $options,  'ArrayRef|HashRef', undef, undef,
-        name     => \my $name,     'Defined',          false, undef,
+        values   => \my $values,   $Array,      undef, undef,
+        output   => \my $output,   $Array,      undef, undef,
+        selected => \my $selected, $ListLike,   false, [],
+        options  => \my $options,  $AssocArray, undef, undef,
+        name     => \my $name,     $Str,        false, undef,
     );
 
     if(defined $options) {
@@ -354,7 +357,21 @@ sub html_options {
     }
 }
 
-#sub html_radios
+sub html_radios {
+    my @extra = _parse_args(
+        {@_},
+        name      => \my $name,      $Str,        true, "radio",
+        values    => \my $values,    $Array,      undef, undef,
+        output    => \my $output,    $Array,      undef, undef,
+        selected  => \my $selected,  $Str,        false, [],
+        options   => \my $options,   $AssocArray, undef, undef,
+        separator => \my $separator, $Str,        false, q{},
+        assign    => \my $assign,    $Str,        false, q{},
+    );
+
+    return ''
+}
+
 #sub html_select_date
 #sub html_select_time
 #sub html_table
