@@ -39,6 +39,12 @@ T
 Hello, Clevy world!
 X
 
+    [<<'T', {a => ['Clevy'] }, <<'X'],
+Hello, {$a[0]} world!
+T
+Hello, Clevy world!
+X
+
     [<<'T', { x => 32 }, <<'X'],
     {$x + 10}
 T
