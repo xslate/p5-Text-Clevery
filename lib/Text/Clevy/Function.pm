@@ -416,6 +416,22 @@ sub html_radios {
     return safe_join "\n", @result;
 }
 
+sub _time_object {
+    my($time) = @_;
+    $time = time() if not defined $time;
+
+    if(!(blessed($time) && $time->can('epoch'))) {
+        if(looks_like_number($time)) {
+            $time = Time::Piece->new($time);
+        }
+        else {
+            # YYY-MM-DD style timestamp
+            $time = Time::Piece->strptime($time, q{%Y-%m-%d});
+        }
+    }
+    return $time;
+}
+
 sub _build_date_options {
     my($field_array, $prefix, $moniker,
        $empty, $values_ref, $names_ref,
@@ -499,19 +515,8 @@ sub html_select_date {
     require Time::Piece;
 
     # complex default values
-    if(not defined $time) {
-        $time = time;
-    }
+    $time = _time_object($time);
 
-    if(!(blessed($time) && $time->can('year'))) {
-        if(looks_like_number($time)) {
-            $time = Time::Piece->new($time);
-        }
-        else {
-            # YYY-MM-DD style timestamp
-            $time = Time::Piece->strptime($time, q{%Y-%m-%d});
-        }
-    }
     if(not defined $start_year) {
         $start_year = $time->year;
     }
@@ -586,7 +591,39 @@ sub html_select_date {
     return safe_join $field_separator, grep { defined } @result{@order};
 }
 
-#sub html_select_time
+sub html_select_time {
+    my %extra = _parse_args(
+        {@_},
+        prefix             => \my $prefix,             $Str,  false, 'Time_',
+        time               => \my $time,               $Str,  false, undef,
+        display_hours      => \my $display_hours,      $Bool, false, true,
+        display_minutes    => \my $display_minutes,    $Bool, false, true,
+        display_seconds    => \my $display_seconds,    $Bool, false, true,
+        display_meridian   => \my $display_meridian,   $Bool, false, true, # am/pm
+        use_24_hours       => \my $use_24_hours,       $Bool, false, true,
+        minute_interval    => \my $minute_interval,    $Int,  false, 1,
+        second_interval    => \my $second_interval,    $Int,  false, 1,
+        field_array        => \my $field_array,        $Str,  false, undef,
+        all_extra          => \my $all_extra,          $Str,  false, undef,
+        minute_extra       => \my $minute_extra,       $Str,  false, undef,
+        second_extra       => \my $second_extra,       $Str,  false, undef,
+        meridian_exra      => \my $meridian_extra,     $Str,  false, undef,
+    );
+    if(%extra) {
+        warnings::warn(misc => "html_select_options: unknown option(s): "
+            . join ", ", sort keys %extra);
+    }
+
+    require Time::Piece;
+
+    # complex default values
+    # TODO
+
+    # build HTML
+    # TODO
+    return 'not yet implemented';
+}
+
 #sub html_table
 #sub mailto
 #sub math
