@@ -4,13 +4,13 @@ extends 'Text::Xslate::Parser';
 
 use Text::Xslate::Util qw(p any_in);
 
+my $SIMPLE_IDENT = qr/( [a-zA-Z_][a-zA-Z0-9_]* )/xms;
+
 sub _build_identity_pattern {
-    return qr{ (?: [/\$]? [a-zA-Z_][a-zA-Z0-9_]* ) }xms;
+    return qr{ (?: [/\$]? $SIMPLE_IDENT ) }xmso;
 }
 
 sub _build_line_start { undef  }
-sub _build_tag_start  { '{' }
-sub _build_tag_end    { '}' }
 
 # preprocess code sections
 around trim_code => sub {
@@ -20,10 +20,10 @@ around trim_code => sub {
     if($code =~ /\A \* .* \* \z/xms) {
         return '';
     }
+
     # config variable
-    elsif($code =~ /\A \# (.*) \# \z/xms) {
-        return sprintf '$clevy.config.%s', $1;
-    }
+    $code =~ s{ \# ($SIMPLE_IDENT) \# }
+              { '$clevy.config.' . $1 }xmsgeo;
 
     return $super->($parser, $code);
 };
@@ -77,7 +77,8 @@ sub init_symbols {
 
     # operators
     $parser->symbol('|')      ->set_led(\&led_pipe); # reset
-    $parser->infix('->', 256) ->set_led($parser->can('led_dot'));
+    $parser->symbol('.')      ->set_led(\&led_dot);  # reset
+    $parser->infix('->', 256) ->set_led(\&led_dot);  # alias to .
 
     # special variables
     $parser->symbol('$clevy') ->set_nud(\&nud_clevy_context);
@@ -107,6 +108,21 @@ sub nud_backquote { # the same as parens
 sub nud_clevy_context {
     my($parser, $symbol) = @_;
     return $parser->call('@clevy_context');
+}
+
+sub led_dot {
+    my($parser, $symbol, $left) = @_;
+
+    # special case: foo.$field
+    if($parser->token->id =~ /\A \$/xms) {
+        return $symbol->clone(
+            arity  => "field",
+            first  => $left,
+            second => $parser->expression( $symbol->lbp ),
+        );
+    }
+
+    return $parser->SUPER::led_dot($symbol, $left);
 }
 
 # variable modifiers

@@ -67,6 +67,20 @@ T
 <h2 style="color:black">This is mine</h1>
 X
 
+    [<<'T', {foobar => 1}, <<'X'],
+{config_load file="t/conf/test.ini"}
+<h2 style="color:{ $smarty.config.titleColor }">{ #pageTitle# }</h1>
+T
+
+<h2 style="color:black">This is mine</h1>
+X
+
+    [<<'T', {foobar => 1}, <<'X'],
+{$smarty.ldelim}foo{$smarty.rdelim}
+T
+{foo}
+X
+
 );
 
 for my $d(@set) {
@@ -75,5 +89,22 @@ for my $d(@set) {
     is eval { $tc->render_string($source, $vars, env => \%env) }, $expected, $msg
         or do { ($@ && diag $@); diag $source };
 }
+
+$tc = Text::Clevy->new(
+    tag_start => '<!--{',
+    tag_end   => '}-->',
+);
+
+is $tc->render_string(<<'T'), <<'X';
+Hello, <!--{ "Clevy" }--> world!
+T
+Hello, Clevy world!
+X
+
+is $tc->render_string(<<'T'), <<'X';
+Hello, <!--{ $clevy.ldelim }-->Clevy<!--{ $clevy.rdelim }--> world!
+T
+Hello, &lt;!--{Clevy}--&gt; world!
+X
 
 done_testing;

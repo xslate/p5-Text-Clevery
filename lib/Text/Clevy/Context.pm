@@ -4,6 +4,13 @@ use Plack::Request;
 
 my $smarty_compat_version = '2.6';
 
+has _engine => (
+    is  => 'ro',
+    isa => 'Object',
+
+    weak_ref => 1,
+);
+
 has env => (
     is  => 'ro',
     isa => 'HashRef',
@@ -104,17 +111,15 @@ has template => (
     default => sub { Text::Xslate->get_current_template_name() },
 );
 
-has ldelim => (
-    is      => 'ro',
-    isa     => 'Str',
-    default => '{',
-);
+sub ldelim {
+    my($self) = @_;
+    return $self->_engine->{tag_start};
+}
 
-has ldelim => (
-    is      => 'ro',
-    isa     => 'Str',
-    default => '}',
-);
+sub rdelim {
+    my($self) = @_;
+    return $self->_engine->{tag_end};
+}
 
 sub server { shift()->env }
 

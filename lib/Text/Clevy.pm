@@ -32,6 +32,10 @@ sub options {
     my $opts = $self->SUPER::options;
 
     $opts->{syntax} = 'Text::Clevy::Parser';
+
+    # set delimiters here to make access easier
+    $opts->{tag_start} = '{';
+    $opts->{tag_end}   = '}';
     return $opts;
 }
 
@@ -54,7 +58,10 @@ sub render {
 sub get_current_context {
     my $self = __PACKAGE__->engine()
         or Carp::confess("Cannot get clevy context outside render()");
-    return $self->{clevy_context} ||= Text::Clevy::Context->new(@{$self->{clevy_context_args}});
+    return $self->{clevy_context} ||= Text::Clevy::Context->new(
+            @{$self->{clevy_context_args}},
+            _engine => $self,
+        );
 }
 
 sub _set_foreach_property {

@@ -18,18 +18,47 @@ T
 Hello, Clevy world!
 X
 
+
+    [<<'T', {lang => 'Clevy'}, <<'X'],
+Hello, {$lang} world!{* comment
+ comment
+ comment *}
+T
+Hello, Clevy world!
+X
+
     [<<'T', {h => { lang => 'Clevy' }}, <<'X'],
 Hello, {$h.lang} world!
 T
 Hello, Clevy world!
 X
 
-    [<<'T', {now => Time::Piece->new($now)}, Time::Piece->new($now)->year, 'arrow'],
+    [<<'T', {h => { lang => 'Clevy' }, f => 'lang' }, <<'X'],
+Hello, {$h.$f} world!
+T
+Hello, Clevy world!
+X
+
+    [<<'T', {h => { lang => 'Clevy' }, f => 'lang' }, <<'X'],
+Hello, {$h[$f]} world!
+T
+Hello, Clevy world!
+X
+
+    [<<'T', {now => Time::Piece->new($now)}, Time::Piece->new($now)->year, 'dot field'],
 { $now.year -}
 T
 
-    [<<'T', {now => Time::Piece->new($now)}, Time::Piece->new($now)->year, 'arrow'],
+    [<<'T', {now => Time::Piece->new($now)}, Time::Piece->new($now)->year, 'dot method'],
 { $now.year() -}
+T
+
+    [<<'T', {now => Time::Piece->new($now)}, Time::Piece->new($now)->year, 'arrow field'],
+{ $now->year -}
+T
+
+    [<<'T', {now => Time::Piece->new($now)}, Time::Piece->new($now)->year, 'arrow method'],
+{ $now->year() -}
 T
 
     [<<'T', {lang => 'Clevy'}, <<'X'],
@@ -102,7 +131,7 @@ T
     ---
 X
 
-    [<<'T', {value => "next x-men film, x3, delayed."}, <<'X'],
+    [<<'T', {value => "next x-men film, x3, delayed."}, <<'X', 'filter'],
 <em>{$value|capitalize}</em>
 <em>{$value|capitalize:false}</em>
 <em>{$value|capitalize:true}</em>
