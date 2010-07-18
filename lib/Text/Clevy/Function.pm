@@ -95,7 +95,7 @@ sub _parse_args {
         Carp::croak("Oops: " . p(@_));
     }
     while(my($name, $var_ref, $type, $required, $default) = splice @_, 0, 5) {
-        if(exists $args->{$name}) {
+        if(defined $args->{$name}) {
             my $value = delete $args->{$name};
             _find_type->($type)->check($value)
                 or _bad_param($type, $name, $value);
