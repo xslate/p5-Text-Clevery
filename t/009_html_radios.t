@@ -31,6 +31,13 @@ T
 <label for="radio_101"><input type="radio" name="radio" value="101" id="radio_101" checked="checked" />Jack</label>
 X
 
+    [<<'T', { cust_ids => [ 100, 101 ], cust_names => [ 'Joe', 'Jack'], id => 101  }, <<'X'],
+{html_radios values=$cust_ids output=$cust_names selected=$id class="foo"}
+T
+<label for="radio_100"><input type="radio" name="radio" value="100" id="radio_100" class="foo" />Joe</label>
+<label for="radio_101"><input type="radio" name="radio" value="101" id="radio_101" checked="checked" class="foo" />Jack</label>
+X
+
 );
 
 for my $d(@set) {

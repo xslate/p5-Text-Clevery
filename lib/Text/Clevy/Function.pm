@@ -395,6 +395,7 @@ sub html_radios {
             value  => $value,
             id     => $id,
             ($selected eq $value ? (checked => 'checked') : ()),
+            @extra,
         ), $label;
         $radio = make_tag(label => $radio, for   => $id);
         if(length $separator) {
