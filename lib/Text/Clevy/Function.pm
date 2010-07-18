@@ -14,6 +14,7 @@ use Scalar::Util qw(
 use Text::Xslate::Util qw(
     p any_in literal_to_value
     mark_raw html_escape
+    $STRING
 );
 
 use Text::Clevy::Util qw(
@@ -416,7 +417,9 @@ sub html_radios {
 }
 
 sub _build_date_options {
-    my($field_array, $prefix, $moniker, $empty, $values_ref, $names_ref, @extra) = @_;
+    my($field_array, $prefix, $moniker,
+       $empty, $values_ref, $names_ref,
+       $size, @others) = @_;
 
     my $name = defined($field_array)
         ? safe_cat( $field_array, '[', $prefix, $moniker, ']')
@@ -427,14 +430,34 @@ sub _build_date_options {
         $values_ref = [q{},    @{$values_ref}];
     }
 
+    my @extra;
+    if(defined $size) {
+        push @extra, size => $size;
+    }
+
+    foreach my $attr_pair(@others) {
+        next if not defined $attr_pair;
+
+        my($name, $value) = $attr_pair =~ m{
+            (\w+) = (\w+ | $STRING)
+        }xms;
+        if($value =~ /\A " (.*) " \z/xms) {
+            $value = $1;
+        }
+        elsif($value =~ /\A ' (.*) ' \z/xms) {
+            $value = $1;
+        }
+        push @extra, mark_raw($name) => mark_raw($value);
+    }
+
     my $options = html_options(
         values => $values_ref,
         output => $names_ref,
-        @extra,
     );
     return make_tag(
         select => safe_cat("\n", $options, "\n"),
         name   => $name,
+        @extra,
     );
 }
 
@@ -448,9 +471,9 @@ sub html_select_date {
         display_days       => \my $display_days,       $Bool, false, true,
         display_months     => \my $display_months,     $Bool, false, true,
         display_years      => \my $display_years,      $Bool, false, true,
-        month_format       => \my $month_format,       $Str,  false, '%B',
-        day_format         => \my $day_format,         $Str,  false, '%02d',
-        day_value_format   => \my $day_value_format,   $Str,  false, '%d',
+        month_format       => \my $month_format,       $Str,  false, '%B',   # for strftime
+        day_format         => \my $day_format,         $Str,  false, '%02d', # for sprintf
+        day_value_format   => \my $day_value_format,   $Str,  false, '%d',   # for sprintf
         year_as_text       => \my $year_as_text,       $Bool, false, false,
         reverse_years      => \my $reverse_years,      $Bool, false, false,
         field_array        => \my $field_array,        $Str,  false, undef,
@@ -463,7 +486,7 @@ sub html_select_date {
         year_extra         => \my $year_extra,         $Str,  false, undef,
         field_order        => \my $field_order,        $Str,  false, 'MDY',
         field_separator    => \my $field_separator,    $Str,  false, "\n",
-        month_value_format => \my $month_value_format, $Str,  false, '%m',
+        month_value_format => \my $month_value_format, $Str,  false, '%m',  # for strftime
         year_empty         => \my $year_empty,         $Str,  false, undef,
         month_empty        => \my $month_empty,        $Str,  false, undef,
         day_empty          => \my $day_empty,          $Str,  false, undef,
@@ -513,14 +536,14 @@ sub html_select_date {
             push @names,  $t->strftime($month_format);
             push @values, $t->strftime($month_value_format);
         }
-        my @extra; # TODO
-
         $result{M} = _build_date_options(
             $field_array, $prefix, 'Month',
             $month_empty,
             \@values,
             \@names,
-            @extra,
+            $month_size,
+            $all_extra,
+            $month_extra,
         );
     }
 
@@ -531,14 +554,14 @@ sub html_select_date {
             push @days,    sprintf($day_format, $d);
             push @dayvals, sprintf($day_value_format, $d);
         }
-        my @extra; # TODO
-
         $result{D} = _build_date_options(
             $field_array, $prefix, 'Day',
             $month_empty,
             \@dayvals,
             \@days,
-            @extra,
+            $day_size,
+            $all_extra,
+            $day_extra,
         );
     }
 
@@ -547,20 +570,20 @@ sub html_select_date {
         if($reverse_years) {
             @years = reverse @years;
         }
-        my @extra; # TODO
-
         $result{Y} = _build_date_options(
             $field_array, $prefix, 'Year',
             $year_empty,
             \@years,
             \@years,
-            @extra,
+            $year_size,
+            $all_extra,
+            $year_extra,
         );
     }
 
 
     my @order = split //, uc $field_order;
-    return safe_join "\n", grep { defined } @result{@order};
+    return safe_join $field_separator, grep { defined } @result{@order};
 }
 
 #sub html_select_time
