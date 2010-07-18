@@ -244,6 +244,13 @@ X
 T
     [FOO]
 X
+
+    [<<'T', {a => "foo"}, <<'X', 'operator precedence'],
+    {$a | cat: " bar" | cat: " baz"}
+T
+    foo bar baz
+X
+
 );
 
 for my $d(@set) {
