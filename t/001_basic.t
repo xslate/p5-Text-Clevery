@@ -205,6 +205,23 @@ T
 
 X
 
+    [<<'T', { a => [] }, <<'X', 'parse'],
+foo{foreach
+    from=$a
+    item=it
+  }{/foreach}bar
+T
+foobar
+X
+
+    [<<'T', { a => [] }, <<'X', 'parse'],
+foo{foreach
+    from=$a
+    item=it
+  }{/foreach}bar
+T
+foobar
+X
 );
 
 for my $d(@set) {

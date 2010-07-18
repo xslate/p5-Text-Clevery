@@ -162,8 +162,9 @@ sub attr_list {
     my @args;
     while(1) {
         my $key = $parser->token;
-
-        if($key->arity ne "name") {
+        if(!($key->arity eq "name"
+                # look ahead for the next token
+                and $parser->next_token->[1] eq '=')) {
             last;
         }
         $parser->advance();
