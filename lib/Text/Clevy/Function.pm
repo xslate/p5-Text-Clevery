@@ -92,13 +92,6 @@ sub config_load {
 #sub strip
 
 
-#sub assign
-#sub counter
-#sub cycle
-#sub debug
-#sub eval
-#sub fetch
-
 sub _parse_args {
     my $args = shift;
     if(@_ % 5) {
@@ -121,6 +114,74 @@ sub _parse_args {
     return if keys(%{$args}) == 0;
     return map { $_ => $args->{$_} } sort keys %{$args};
 }
+
+#sub assign
+#sub counter
+
+sub cycle {
+    my %extra = _parse_args(
+        {@_},
+        # name => var_ref, type, required, default
+        name      => \my $name,      'Defined',    false, 'default',
+        values    => \my $values,    'Defined',    false,  undef,
+        print     => \my $print,     'Bool',       false, true,
+        advance   => \my $advance,   'Bool',       false, true,
+        delimiter => \my $delimiter, 'Defined',    false, ',',
+        assign    => \my $assign,    'Defined',    false, undef,
+        reset     => \my $reset,     'Bool',       false, false,
+    );
+    if(%extra) {
+        warnings::warn(misc => "cycle: unknown option(s): "
+            . join ", ", sort keys %extra);
+    }
+
+    my $storage = $EngineClass->get_current_context->_storage;
+    my $this    = $storage->{cycle}{$name} ||= {
+        values => [],
+        index  => 0,
+    };
+
+    if(defined $values) {
+        if(ref($values) eq 'ARRAY') {
+            @{$this->{values}} = @{$values};
+        }
+        else {
+            @{$this->{values}} = (split /$delimiter/, $values);
+            $values = $this->{values};
+        }
+    }
+    else {
+        $values = $this->{values};
+    }
+
+    if(!@{$values}) {
+        _required('values');
+    }
+
+    if($reset) {
+        $this->{index} = 0;
+    }
+
+    if($assign) {
+        die "cycle: 'assign' option is not supported";
+    }
+
+    my $retval = $print
+        ? $values->[$this->{index}]
+        : '';
+
+    if($advance) {
+        if(++$this->{index} >= @{$values}) {
+            $this->{index} = 0;
+        }
+    }
+
+    return $retval;
+}
+
+#sub debug
+#sub eval
+#sub fetch
 
 sub _split_assoc_array {
     my($assoc) = @_;
