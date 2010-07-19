@@ -163,40 +163,6 @@ T
     [baz]
 X
 
-    [<<'T', { a => [1 .. 5] }, <<'X'],
-    {counter start=0 skip=2}
-    {counter}
-    {counter}
-    {counter}
-T
-    0
-    2
-    4
-    6
-X
-
-    [<<'T', { a => [1 .. 5] }, <<'X'],
-{foreach from=$a item=it -}
-    {$it} - {cycle values="foo,bar"} {cycle advance=false}
-{/foreach -}
-{cycle reset=true print=false advance=false}
-{foreach from=$a item=it -}
-    {$it} - {cycle values=["foo", "bar", "baz"]}{cycle print=false}
-{/foreach -}
-T
-    1 - foo bar
-    2 - bar foo
-    3 - foo bar
-    4 - bar foo
-    5 - foo bar
-
-    1 - foo
-    2 - baz
-    3 - bar
-    4 - foo
-    5 - baz
-X
-
     [<<'T', { value => 'foo' }, <<'X'],
 {literal}[{$value}]{/literal}
 T
