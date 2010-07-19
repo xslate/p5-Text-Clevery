@@ -152,7 +152,7 @@ sub counter {
     );
 
     my $storage = $EngineClass->get_current_context->_storage;
-    my $this    = $storage->{cycle}{$name} ||= {
+    my $this    = $storage->{counter}{$name} ||= {
         count  => defined($start) ? $start : 1,
         skip   => defined($skip)  ? $skip  : 1,
     };
