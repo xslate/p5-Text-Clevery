@@ -135,6 +135,72 @@ This software is under development.
 
 This is a subclass of Text::Xslate. See L<Text::Xslate> for details
 
+=head1 COMPATIBILITY
+
+=head2 Unsupported features
+
+There are unsupported features, listed as follows.
+
+=over
+
+=item *
+
+C<< {include_php} >>
+
+=item *
+
+C<< {insert} >>
+
+=item *
+
+C<< {php} >>
+
+=item *
+
+C<< {section} >>
+
+=item *
+
+C<< {strip} >>
+
+=item *
+
+C<< {assign} >>
+
+=item *
+
+C<< {debug} >>
+
+=item *
+
+C<< {eval} >>
+
+=item *
+
+C<< {fetch} >>
+
+=item *
+
+C<< {mailto} >>
+
+=item *
+
+C<< {math} >>
+
+=item *
+
+C<< {popup} >>
+
+=item *
+
+C<< {popup_init} >>
+
+=item *
+
+C<< {textformat} >>
+
+=back
+
 =head1 DEPENDENCIES
 
 Perl 5.8.1 or later.
