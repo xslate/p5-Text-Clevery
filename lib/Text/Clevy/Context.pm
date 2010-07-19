@@ -1,6 +1,5 @@
 package Text::Clevy::Context;
 use Any::Moose;
-use Plack::Request;
 
 has _engine => (
     is  => 'ro',
@@ -23,6 +22,7 @@ has request => (
     lazy    => 1,
     default => sub {
         my($self) = @_;
+        require Plack::Request;
         return Plack::Request->new( $self->env );
     },
 
