@@ -432,8 +432,8 @@ sub _init_time_object {
             $time = Time::Piece->new($time);
         }
         else {
-            # YYY-MM-DD style timestamp
-            $time = Time::Piece->strptime($time, q{%Y-%m-%d});
+            # YYY-MM-DD HH:MM:SS style timestamp
+            $time = Time::Piece->strptime($time, q{%Y-%m-%d %H:%M:%S});
         }
     }
     return $time;
