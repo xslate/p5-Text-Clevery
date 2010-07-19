@@ -22,7 +22,7 @@ around trim_code => sub {
     }
 
     # config variable
-    $code =~ s{ \# ($SIMPLE_IDENT) \# }
+    $code =~ s{ \# \s* (\S+) \s* \# }
               { '$clevy.config.' . $1 }xmsgeo;
 
     return $parser->$super($code);

@@ -79,31 +79,6 @@ sub _bad_param {
     Carp::croak("InvalidValue for '$name': " . $type->get_message($value));
 }
 
-sub config_load {
-    my(%args) = @_;
-
-    require Config::Tiny;
-    my $c = Config::Tiny->read($args{file})
-        || Carp::croak(Config::Tiny->errstr);
-
-    my $config = $EngineClass->get_current_context->config;
-
-    while(my($section_name, $section_config) = each %{$c}) {
-        my $storage = $section_name eq '_'
-            ?  $config
-            : ($config->{$section_name} ||= {});
-
-        while(my($key, $literal) = each %{$section_config}) {
-            $storage->{$key} = literal_to_value($literal);
-        }
-    }
-    return '';
-}
-
-#sub php; # never implemented!
-#sub strip
-
-
 sub _parse_args {
     my $args = shift;
     if(@_ % 5) {
@@ -136,6 +111,56 @@ sub _parse_args {
         }
     }
 }
+
+sub config_load {
+    _parse_args(
+        {@_},
+        file    => \my $file,    $Str, true,   undef,
+        section => \my $section, $Str, false,  undef,
+        scope   => \my $scope,   $Str, false, 'local', # or 'parent', 'global'
+    );
+
+    require Config::Tiny;
+    my $c = Config::Tiny->read($file)
+        || Carp::croak(Config::Tiny->errstr);
+
+    my %config;
+
+    my $root = defined($section)
+        ? $config{$section} ||= {}
+        : \%config;
+
+    while(my($section_name, $section_config) = each %{$c}) {
+        my $storage = $section_name eq '_'
+            ?  $root
+            : ($config{$section_name} ||= {});
+
+        while(my($key, $literal) = each %{$section_config}) {
+            $storage->{$key} = literal_to_value($literal);
+        }
+    }
+
+    my $context = $EngineClass->get_current_context;
+    my $top     = $context->_storage->{config} ||= {
+        '@global' => {}, # prototype of all the config storages
+    };
+
+    if($scope eq 'local') {
+        my $this = $context->config;
+        %{$this} = (%{$this}, %config);
+    }
+    else { # TODO: distingwish between 'global' and 'parent'
+        require Storable;
+        foreach my $this(values %{$top}) {
+            %{$this} = (%{$this}, %{ Storable::dclone(\%config) });
+        }
+    }
+
+    return '';
+}
+
+#sub php; # never implemented!
+#sub strip
 
 #sub assign
 
@@ -859,3 +884,52 @@ sub html_table {
 
 no Any::Moose '::Util::TypeConstraints';
 1;
+__END__
+
+=head1 NAME
+
+Text::Clevy - Smarty compatible template engine on Xslate
+
+=head1 FUNCTION
+
+=head2 config_load
+
+=head2 counter
+
+=head2 cycle
+
+=head2 html_checkboxes
+
+=head2 html_image
+
+=head2 html_options
+
+=head2 html_radios
+
+=head2 html_select_date
+
+=head2 html_select_time
+
+=head2 html_table
+
+=head2 mailto
+
+Not supported.
+
+=head2 math
+
+Not supported.
+
+=head2 popup
+
+Not supported.
+
+=head2 popup_init
+
+Not supported.
+
+=head2 textformat
+
+Not supported.
+
+=cut

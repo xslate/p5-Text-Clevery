@@ -60,7 +60,7 @@ X
 
 
     [<<'T', {foobar => 1}, <<'X'],
-{config_load file="t/conf/test.ini"}
+{config_load file="t/conf/test.conf"}
 <h2 style="color:{$smarty.config.titleColor}">{#pageTitle#}</h1>
 T
 
@@ -68,12 +68,21 @@ T
 X
 
     [<<'T', {foobar => 1}, <<'X'],
-{config_load file="t/conf/test.ini"}
+{config_load file="t/conf/test.conf"}
 <h2 style="color:{ $smarty.config.titleColor }">{ #pageTitle# }</h1>
 T
 
 <h2 style="color:black">This is mine</h1>
 X
+
+    [<<'T', {foobar => 1}, <<'X'],
+{config_load file="t/conf/test.conf" section=foo}
+<h2 style="color:{ $smarty.config.foo.titleColor }">{ #foo.pageTitle# }</h1>
+T
+
+<h2 style="color:black">This is mine</h1>
+X
+
 
     [<<'T', {foobar => 1}, <<'X'],
 {$smarty.ldelim}foo{$smarty.rdelim}

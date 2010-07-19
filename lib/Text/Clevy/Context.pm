@@ -61,14 +61,6 @@ has session => (
     default => \&_build_hashref,
 );
 
-has config => (
-    is  => 'ro',
-    isa => 'HashRef',
-
-    lazy    => 1,
-    default => \&_build_hashref,
-);
-
 has const => (
     is  => 'ro',
     isa => 'HashRef',
@@ -108,6 +100,18 @@ has _storage => ( # per-request storage
     lazy    => 1,
     default => \&_build_hashref,
 );
+
+sub config {
+    my($self) = @_;
+
+    my $file   = $self->_engine->current_file();
+    my $config = $self->_storage->{config} ||= {};
+    return $config->{$file} ||= do {
+        require Storable;
+        my $proto = $config->{'@global'} ||= {};
+        Storable::dclone($proto);
+    };
+}
 
 sub template {
     my($self) = @_;
