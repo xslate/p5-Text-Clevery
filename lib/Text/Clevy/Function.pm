@@ -138,7 +138,40 @@ sub _parse_args {
 }
 
 #sub assign
-#sub counter
+
+sub counter {
+    _parse_args(
+        {@_},
+        # name => var_ref, type, required, default
+        name      => \my $name,      $Str,      false, 'default',
+        start     => \my $start,     $Int,      false,  undef,
+        skip      => \my $skip,      $Int,      false,  undef,
+        direction => \my $direction, $Str,      false, 'up', # or 'down'
+        print     => \my $print,     $Bool,     false, true,
+        assign    => \my $assign,    $Str,      false, undef,
+    );
+
+    my $storage = $EngineClass->get_current_context->_storage;
+    my $this    = $storage->{cycle}{$name} ||= {
+        count  => defined($start) ? $start : 1,
+        skip   => defined($skip)  ? $skip  : 1,
+    };
+
+    if($assign) {
+        die "cycle: 'assign' is not supported";
+    }
+
+    my $retval = $print ? $this->{count} : '';
+
+    if($direction eq 'up') {
+        $this->{count} += $this->{skip};
+    }
+    else {
+        $this->{count} -= $this->{skip};
+    }
+
+    return $retval;
+}
 
 sub cycle {
     _parse_args(

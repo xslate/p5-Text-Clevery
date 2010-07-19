@@ -164,6 +164,18 @@ T
 X
 
     [<<'T', { a => [1 .. 5] }, <<'X'],
+    {counter start=0 skip=2}
+    {counter}
+    {counter}
+    {counter}
+T
+    0
+    2
+    4
+    6
+X
+
+    [<<'T', { a => [1 .. 5] }, <<'X'],
 {foreach from=$a item=it -}
     {$it} - {cycle values="foo,bar"} {cycle advance=false}
 {/foreach -}
