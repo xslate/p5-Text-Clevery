@@ -34,11 +34,11 @@ my $AssocArray = subtype __PACKAGE__ . '.AssocArray', as 'ArrayRef|HashRef';
 require Text::Clevy;
 our $EngineClass = 'Text::Clevy';
 
+# Implemented as statements:
 # {capture}, {foreach}, {literal}, {section}, {strip}
-# are defined as block statements
+# {include}
 my @functions = map { $_ => __PACKAGE__->can($_) || _make_not_impl($_) } qw(
     config_load
-    include
     include_php
     insert
 
@@ -66,7 +66,7 @@ sub get_table { @functions }
 
 sub _make_not_impl {
     my($name) = @_;
-    return sub { die "Function $name is not implemented.\n" };
+    return sub { die "Function {$name} is not implemented.\n" };
 }
 
 sub _required {

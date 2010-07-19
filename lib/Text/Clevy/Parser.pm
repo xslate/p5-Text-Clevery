@@ -91,12 +91,13 @@ sub init_symbols {
     $parser->symbol('if')    ->set_std(\&std_if);
     $parser->symbol('elseif')->is_block_end(1);
     $parser->symbol('else')  ->is_block_end(1);
+    $parser->symbol('/if')   ->is_block_end(1);
 
-    $parser->symbol('foreach')->set_std(\&std_foreach);
+    $parser->symbol('foreach')    ->set_std(\&std_foreach);
     $parser->symbol('foreachelse')->is_block_end(1);
+    $parser->symbol('/foreach')   ->is_block_end(1);
 
-    $parser->symbol('/if')      ->is_block_end(1);
-    $parser->symbol('/foreach') ->is_block_end(1);
+    $parser->symbol('include')->set_std(\&std_include);
 
     return;
 }
@@ -313,10 +314,39 @@ sub std_foreach {
 
     if(defined $key) {
         $for = $parser->_not_implemented($symbol,
-            "'key' attribute for {foreach}");
+            "'key' attribute for {$symbol}");
     }
 
     return $for;
+}
+
+sub std_include {
+    my($parser, $symbol) = @_;
+
+    my $include = $symbol->clone(
+        arity => 'command',
+    );
+
+    my @args = $parser->attr_list();
+
+    my $file;
+    for(my $i = 0; $i < @args; $i += 2) {
+        my $key = $args[$i]->id;
+
+        if($key eq 'assign') {
+            return $parser->_not_implemented($symbol, "'assign' attribute for {$symbol}");
+        }
+        elsif($key eq 'file') {
+            $file = $args[$i+1];
+            splice @args, $i, 2; # delete
+        }
+    }
+
+    return $symbol->clone(
+        arity  => 'command',
+        first  => [ $file ],
+        second => \@args,
+    );
 }
 
 sub _not_implemented {
