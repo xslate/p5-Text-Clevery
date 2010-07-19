@@ -432,10 +432,29 @@ sub _init_time_object {
     return $time;
 }
 
+sub _deparse_html_attr {
+    my($attr) = @_;
+    return if not $attr;
+
+    my($name, $value) = $attr =~ m{
+        (\w+) = (\w+ | $STRING)
+    }xms or return;
+
+    if($value =~ /\A " (.*) " \z/xms) {
+        $value = $1;
+    }
+    elsif($value =~ /\A ' (.*) ' \z/xms) {
+        $value = $1;
+    }
+    $value =~ s/"/&quot;/g; # ensure " is gone
+    $value =~ s/'/&apos;/g; # ensure ' is gone
+    return mark_raw($name) => mark_raw($value);
+}
+
 sub _build_datetime_options {
     my($field_array, $prefix, $moniker,
        $empty, $values_ref, $names_ref, $selected,
-       @others) = @_;
+       @extra) = @_;
 
     my $name = defined($field_array)
         ? safe_cat( $field_array, '[', $prefix, $moniker, ']')
@@ -446,24 +465,6 @@ sub _build_datetime_options {
         $values_ref = [q{},    @{$values_ref}];
     }
 
-    my @extra;
-    foreach my $attr_pair(@others) {
-        next if not defined $attr_pair;
-
-        my($name, $value) = $attr_pair =~ m{
-            (\w+) = (\w+ | $STRING)
-        }xms;
-        if($value =~ /\A " (.*) " \z/xms) {
-            $value = $1;
-            $value =~ s/"/&quot;/g; # ensure " is gone
-        }
-        elsif($value =~ /\A ' (.*) ' \z/xms) {
-            $value = $1;
-            $value =~ s/'/&apos;/g; # ensure ' is gone
-        }
-        push @extra, mark_raw($name) => mark_raw($value);
-    }
-
     my $options = html_options(
         values   => $values_ref,
         output   => $names_ref,
@@ -472,7 +473,8 @@ sub _build_datetime_options {
     return make_tag(
         select => safe_cat("\n", $options, "\n"),
         name   => $name,
-        @extra,
+
+        map { _deparse_html_attr($_) } @extra,
     );
 }
 
@@ -713,25 +715,101 @@ sub html_select_time {
     return safe_join $field_separator, @result;
 }
 
+sub _html_table_attr {
+    my($attrs, $n) = @_;
+    return _deparse_html_attr(
+        ref($attrs) eq 'ARRAY'
+            ? $attrs->[ $n % @{$attrs} ] # cycle
+            : $attrs
+    );
+}
+
 sub html_table {
     my %extra = _parse_args(
         {@_},
         loop       => \my $loop,       $Array,    true,  undef,
         cols       => \my $cols,       $ListLike, false, 3,
-        rows       => \my $rows,       $Int,      false, undef,
-        inner      => \my $innter,     $Str,      false, 'cols',
+        rows       => \my $rows,       $Int,      false, 3,
+        inner      => \my $inner,      $Str,      false, 'cols', # or 'rows'
         caption    => \my $caption,    $Str,      false, undef,
         table_attr => \my $table_attr, $Str,      false, q{border="1"},
         th_attr    => \my $th_attr,    $ListLike, false, undef,
         tr_attr    => \my $tr_attr,    $ListLike, false, undef,
         td_attr    => \my $td_attr,    $ListLike, false, undef,
         trailpad   => \my $trailpad,   $Str,      false, mark_raw('&nbsp;'),
-        vdir       => \my $vdir,       $Str,      false, 'down',
+        hdir       => \my $hdir,       $Str,      false, 'right', # or 'left'
+        vdir       => \my $vdir,       $Str,      false, 'down',  # or 'up'
     );
     if(%extra) {
         warnings::warn(misc => "html_select_options: unknown option(s): "
             . join ", ", sort keys %extra);
     }
+
+    my $loop_count = @{$loop};
+
+    my $cols_count;
+    if(looks_like_number($cols)) {
+        $cols_count = $cols;
+        undef $cols;
+    }
+    elsif(ref $cols eq 'ARRAY') {
+        $cols_count = @{$cols};
+    }
+    else {
+        $cols       = [ split /,/, $cols ];
+        $cols_count = @{$cols};
+    }
+
+    # build HTML
+
+    my @table;
+    if(defined $caption) {
+        push @table, make_tag caption => $caption;
+    }
+
+    if(defined $cols) {
+        if($hdir ne 'right') {
+            $cols = [reverse @{$cols}];
+        }
+        my @h;
+        for(my $r = 0; $r < $cols_count; $r++) {
+            push @h, make_tag(th => $cols->[$r],
+                _html_table_attr($th_attr, $r));
+        }
+        my $tr = make_tag(tr => safe_cat("\n", @h, "\n"));
+        push @table, make_tag thead => safe_join("\n", '', $tr, '');
+    }
+
+    my @tbody;
+    for(my $r = 0; $r < $rows; $r++) {
+        my $rx = ($vdir eq 'down')
+            ? $r * $cols_count
+            : ($rows - 1 - $r) * $cols_count;
+
+        my @cols;
+        for(my $c = 0; $c < $cols_count; $c++) {
+            my $x = ($hdir eq 'right')
+                ? $rx + $c
+                : $rx + $cols_count - 1 - $c;
+            if($inner ne 'cols') {
+                $x = int($x / $cols_count) + ($x % $cols_count) * $rows;
+            }
+
+            push @cols, make_tag
+                td => ($x < $loop_count ? $loop->[$x] : $trailpad),
+                _html_table_attr($td_attr, $r);
+        }
+
+        push @tbody, make_tag(tr => safe_cat(@cols),
+            _html_table_attr($tr_attr, $r));
+    }
+
+    if(@tbody) {
+        push @table, make_tag(tbody => safe_join "\n", '', @tbody, '');
+    }
+    return make_tag
+        table => safe_join("\n", '', @table, ''),
+        _deparse_html_attr($table_attr);
 }
 
 #sub mailto
