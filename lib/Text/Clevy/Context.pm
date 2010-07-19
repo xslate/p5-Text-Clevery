@@ -139,3 +139,11 @@ sub _build_hashref {
 }
 no Any::Moose;
 __PACKAGE__->meta->make_immutable();
+__END__
+
+=head1 NAME
+
+Text::Clevy::Context - Per-request context object
+
+=cut
+

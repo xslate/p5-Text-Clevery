@@ -22,3 +22,7 @@ xslate
 mailto
 popup
 textformat
+br
+nl
+spacify
+wordwrap

@@ -1,4 +1,7 @@
 Revision history for Perl extension Text::Clevy
 
+0.0001_01 Mon Jul 19 17:10:16 2010
+    - First development release!
+
 0.01 Fri Jun 18 09:19:21 2010
     - original version; created by Module::Setup

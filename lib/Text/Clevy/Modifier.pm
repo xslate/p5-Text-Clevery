@@ -278,3 +278,55 @@ sub wordwrap {
 }
 
 1;
+__END__
+
+=head1 NAME
+
+Text::Clevy::Modifier - Smarty compatible expression modifiers
+
+=head1 MODIFIER
+
+=head2 capitalize
+
+=head2 cat
+
+=head2 count_characters
+
+=head2 count_paragraphs
+
+=head2 count_sentences
+
+=head2 count_words
+
+=head2 date_format
+
+=head2 default
+
+=head2 escape
+
+=head2 indent
+
+=head2 lower
+
+=head2 nl2br
+
+=head2 regex_replace
+
+=head2 replace
+
+=head2 spacify
+
+=head2 string_format
+
+=head2 strip
+
+=head2 strip_tags
+
+=head2 truncate
+
+=head2 upper
+
+=head2 wordwrap
+
+=cut
+

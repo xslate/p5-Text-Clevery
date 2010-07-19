@@ -60,3 +60,10 @@ sub ceil {
     return int(int($n) < $n ? $n + 1 : $n);
 }
 1;
+__END__
+
+=head1 NAME
+
+Text::Clevy::Util - Utilities for Text::Clevy
+
+=cut

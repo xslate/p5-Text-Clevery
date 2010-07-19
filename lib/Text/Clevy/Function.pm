@@ -888,7 +888,7 @@ __END__
 
 =head1 NAME
 
-Text::Clevy - Smarty compatible template engine on Xslate
+Text::Clevy::Function - Smarty compatible template functions
 
 =head1 FUNCTION
 
