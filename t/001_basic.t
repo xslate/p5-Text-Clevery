@@ -8,7 +8,7 @@ use Text::Clevy::Parser;
 use Text::Clevy::Util qw(ceil floor);
 use Time::Piece ();
 
-my $now = time();
+my $now = Time::Piece->new();
 
 my $tc = Text::Clevy->new(verbose => 2);
 
@@ -43,19 +43,19 @@ T
     42
 X
 
-    [<<'T', {now => Time::Piece->new($now)}, Time::Piece->new($now)->year, 'dot field'],
+    [<<'T', {now => $now}, $now->year, 'dot field'],
 { $now.year -}
 T
 
-    [<<'T', {now => Time::Piece->new($now)}, Time::Piece->new($now)->year, 'dot method'],
+    [<<'T', {now => $now}, $now->year, 'dot method'],
 { $now.year() -}
 T
 
-    [<<'T', {now => Time::Piece->new($now)}, Time::Piece->new($now)->year, 'arrow field'],
+    [<<'T', {now => $now}, $now->year, 'arrow field'],
 { $now->year -}
 T
 
-    [<<'T', {now => Time::Piece->new($now)}, Time::Piece->new($now)->year, 'arrow method'],
+    [<<'T', {now => $now}, $now->year, 'arrow method'],
 { $now->year() -}
 T
 

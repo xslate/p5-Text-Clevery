@@ -5,9 +5,6 @@ use Test::More;
 
 use Text::Clevy;
 use Text::Clevy::Parser;
-use Time::Piece ();
-
-my $now = time();
 
 my $tc = Text::Clevy->new(verbose => 2);
 
@@ -18,11 +15,25 @@ my @set = (
     {counter}
     {counter}
     {counter}
+    {counter print=false}-
 T
     0
     2
     4
     6
+    -
+X
+
+    [<<'T', { a => [1 .. 5] }, <<'X'],
+    {counter name="foo"} {counter name="bar"}
+    {counter name="foo"} {counter name="bar"}
+    {counter name="foo"} {counter name="bar"}
+    {counter name="foo"} {counter name="bar"}
+T
+    1 1
+    2 2
+    3 3
+    4 4
 X
 
     [<<'T', { a => [1 .. 5] }, <<'X'],
