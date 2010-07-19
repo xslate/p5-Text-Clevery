@@ -4,7 +4,7 @@ extends 'Text::Xslate::Parser';
 
 use Text::Xslate::Util qw(p any_in);
 
-my $SIMPLE_IDENT = qr/( [a-zA-Z_][a-zA-Z0-9_]* )/xms;
+my $SIMPLE_IDENT = qr/(?: [a-zA-Z_][a-zA-Z0-9_]* )/xms;
 
 sub _build_identity_pattern {
     return qr{ (?: [/\$]? $SIMPLE_IDENT ) }xmso;
@@ -16,7 +16,7 @@ sub _build_line_start { undef  }
 around trim_code => sub {
     my($super, $parser, $code) = @_;
 
-    # comment
+    # comment {* ... *}
     if($code =~ /\A \* .* \* \z/xms) {
         return '';
     }
@@ -78,7 +78,8 @@ sub init_symbols {
     # operators
     $parser->symbol('|')      ->set_led(\&led_pipe); # reset
     $parser->symbol('.')      ->set_led(\&led_dot);  # reset
-    $parser->infix('->', 256) ->set_led(\&led_dot);  # alias to .
+    $parser->infix('->', $parser->symbol('.')->lbp)
+                              ->set_led(\&led_dot);  # alias to .
 
     # special variables
     $parser->symbol('$clevy') ->set_nud(\&nud_clevy_context);
@@ -186,7 +187,7 @@ sub attr_list {
     return @args;
 }
 
-sub std_name {
+sub std_name { # simple names are assumed as commands
     my($parser, $symbol) = @_;
 
     my @args = $parser->attr_list();
@@ -280,8 +281,8 @@ sub std_foreach {
     if($parser->token->id eq 'foreachelse') {
         $parser->advance();
 
-        # if array_is_empty(my $array = expr) {
-        #    foreach expr -> ...
+        # if array_is_not_empty(my $array = expr) {
+        #    foreach $array -> ...
         # }
         # else {
         #    foreachelse ...
