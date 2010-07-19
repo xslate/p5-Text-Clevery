@@ -3,7 +3,6 @@ use strict;
 use warnings;
 
 use Any::Moose '::Util::TypeConstraints';
-use Config::Tiny ();
 use File::Spec;
 
 use Scalar::Util qw(
@@ -83,6 +82,7 @@ sub _bad_param {
 sub config_load {
     my(%args) = @_;
 
+    require Config::Tiny;
     my $c = Config::Tiny->read($args{file})
         || Carp::croak(Config::Tiny->errstr);
 
