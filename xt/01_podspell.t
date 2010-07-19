@@ -19,3 +19,6 @@ Text::Clevy
 gfx
 cpan
 xslate
+mailto
+popup
+textformat
