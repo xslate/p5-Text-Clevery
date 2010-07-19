@@ -123,14 +123,24 @@ sub _parse_args {
         }
     }
     return if keys(%{$args}) == 0;
-    return map { $_ => $args->{$_} } sort keys %{$args};
+
+    if(defined wantarray) {
+        return map { $_ => $args->{$_} } sort keys %{$args};
+    }
+    else {
+        if(%{$args}) {
+            my $name = (caller 0)[3];
+            warnings::warn(misc => "$name: Unknown option(s): "
+                . join ", ", sort keys %{$args});
+        }
+    }
 }
 
 #sub assign
 #sub counter
 
 sub cycle {
-    my %extra = _parse_args(
+    _parse_args(
         {@_},
         # name => var_ref, type, required, default
         name      => \my $name,      $Str,      false, 'default',
@@ -141,10 +151,6 @@ sub cycle {
         assign    => \my $assign,    $Str,      false, undef,
         reset     => \my $reset,     $Bool,     false, false,
     );
-    if(%extra) {
-        warnings::warn(misc => "cycle: unknown option(s): "
-            . join ", ", sort keys %extra);
-    }
 
     my $storage = $EngineClass->get_current_context->_storage;
     my $this    = $storage->{cycle}{$name} ||= {
@@ -479,7 +485,7 @@ sub _build_datetime_options {
 }
 
 sub html_select_date {
-    my %extra = _parse_args(
+    _parse_args(
         {@_},
         prefix             => \my $prefix,             $Str,  false, 'Date_',
         time               => \my $time,               $Str,  false, undef,
@@ -515,10 +521,6 @@ sub html_select_date {
         field_order        => \my $field_order,        $Str,  false, 'MDY',
         field_separator    => \my $field_separator,    $Str,  false, "\n",
     );
-    if(%extra) {
-        warnings::warn(misc => "html_select_options: unknown option(s): "
-            . join ", ", sort keys %extra);
-    }
 
     require Time::Piece;
 
@@ -602,7 +604,7 @@ sub html_select_date {
 }
 
 sub html_select_time {
-    my %extra = _parse_args(
+    _parse_args(
         {@_},
         prefix             => \my $prefix,             $Str,  false, 'Time_',
         time               => \my $time,               $Str,  false, undef,
@@ -630,10 +632,6 @@ sub html_select_time {
 
         field_separator    => \my $field_separator,    $Str,  false, "\n",
     );
-    if(%extra) {
-        warnings::warn(misc => "html_select_options: unknown option(s): "
-            . join ", ", sort keys %extra);
-    }
 
     require Time::Piece;
 
@@ -725,7 +723,7 @@ sub _html_table_attr {
 }
 
 sub html_table {
-    my %extra = _parse_args(
+    _parse_args(
         {@_},
         loop       => \my $loop,       $Array,    true,  undef,
         cols       => \my $cols,       $ListLike, false, 3,
@@ -740,10 +738,6 @@ sub html_table {
         hdir       => \my $hdir,       $Str,      false, 'right', # or 'left'
         vdir       => \my $vdir,       $Str,      false, 'down',  # or 'up'
     );
-    if(%extra) {
-        warnings::warn(misc => "html_select_options: unknown option(s): "
-            . join ", ", sort keys %extra);
-    }
 
     my $loop_count = @{$loop};
 
