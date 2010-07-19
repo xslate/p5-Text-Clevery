@@ -5,6 +5,7 @@ use Test::More;
 
 use Text::Clevy;
 use Text::Clevy::Parser;
+use Text::Clevy::Util qw(ceil floor);
 use Time::Piece ();
 
 my $now = time();
@@ -229,5 +230,16 @@ for my $d(@set) {
     is eval { $tc->render_string($source, $vars) }, $expected, $msg
         or do { ($@ && diag $@); diag $source };
 }
+
+# utils
+is ceil(0.1), 1;
+is ceil(0.8), 1;
+is ceil(5.1), 6;
+is ceil(5.8), 6;
+
+is floor(0.1), 0;
+is floor(0.8), 0;
+is floor(5.1), 5;
+is floor(5.8), 5;
 
 done_testing;

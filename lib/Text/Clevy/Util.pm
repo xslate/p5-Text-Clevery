@@ -10,6 +10,7 @@ our @EXPORT_OK = qw(
     make_tag
     true
     false
+    ceil floor
 );
 
 use Text::Xslate::Util qw(
@@ -49,4 +50,13 @@ sub safe_cat {
         map { html_escape($_)->as_string } @_;
 }
 
+sub floor {
+    my($n) = @_;
+    return int(int($n) > $n ? $n - 1 : $n);
+}
+
+sub ceil {
+    my($n) = @_;
+    return int(int($n) < $n ? $n + 1 : $n);
+}
 1;

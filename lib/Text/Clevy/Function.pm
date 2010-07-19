@@ -21,6 +21,7 @@ use Text::Clevy::Util qw(
     safe_join safe_cat
     make_tag
     true false
+    ceil floor
 );
 
 my $Bool       = subtype __PACKAGE__ . '.Bool',  as 'Bool';
@@ -726,8 +727,8 @@ sub html_table {
     _parse_args(
         {@_},
         loop       => \my $loop,       $Array,    true,  undef,
-        cols       => \my $cols,       $ListLike, false, 3,
-        rows       => \my $rows,       $Int,      false, 3,
+        cols       => \my $cols,       $ListLike, false, undef,
+        rows       => \my $rows,       $Int,      false, undef,
         inner      => \my $inner,      $Str,      false, 'cols', # or 'rows'
         caption    => \my $caption,    $Str,      false, undef,
         table_attr => \my $table_attr, $Str,      false, q{border="1"},
@@ -749,13 +750,24 @@ sub html_table {
     elsif(ref $cols eq 'ARRAY') {
         $cols_count = @{$cols};
     }
-    else {
+    elsif(defined $cols){
         $cols       = [ split /,/, $cols ];
         $cols_count = @{$cols};
     }
+    else {
+        $cols_count = 3;
+    }
+
+    if(not defined $rows) {
+        $rows = ceil($loop_count / $cols_count);
+    }
+    elsif(not defined $cols) {
+        if(defined $rows) {
+            $cols_count = ceil($loop_count / $rows);
+        }
+    }
 
     # build HTML
-
     my @table;
     if(defined $caption) {
         push @table, make_tag caption => $caption;
@@ -780,21 +792,21 @@ sub html_table {
             ? $r * $cols_count
             : ($rows - 1 - $r) * $cols_count;
 
-        my @cols;
+        my @d;
         for(my $c = 0; $c < $cols_count; $c++) {
             my $x = ($hdir eq 'right')
                 ? $rx + $c
                 : $rx + $cols_count - 1 - $c;
             if($inner ne 'cols') {
-                $x = int($x / $cols_count) + ($x % $cols_count) * $rows;
+                $x = floor($x / $cols_count) + ($x % $cols_count) * $rows;
             }
 
-            push @cols, make_tag
+            push @d, make_tag
                 td => ($x < $loop_count ? $loop->[$x] : $trailpad),
                 _html_table_attr($td_attr, $r);
         }
 
-        push @tbody, make_tag(tr => safe_cat(@cols),
+        push @tbody, make_tag(tr => safe_cat(@d),
             _html_table_attr($tr_attr, $r));
     }
 
