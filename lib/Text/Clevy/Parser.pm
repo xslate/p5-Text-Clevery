@@ -165,16 +165,16 @@ sub attr_list {
     while(1) {
         my $key = $parser->token;
         if(!($key->arity eq "name"
-                # look ahead for the next token
-                and $parser->next_token->[1] eq '=')) {
+                and $parser->next_token_is('='))) {
             last;
         }
         $parser->advance();
         $parser->advance("=");
 
         my $value;
-        if($parser->token->arity eq "name") {
-            $value = $parser->token->clone(arity => 'literal');
+        my $t = $parser->token;
+        if($t->arity eq "name" && !$t->is_defined) {
+            $value = $t->clone(arity => 'literal');
             $parser->advance();
         }
         else {

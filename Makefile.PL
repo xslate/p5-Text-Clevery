@@ -7,7 +7,7 @@ use Module::Install::Repository;
 all_from 'lib/Text/Clevy.pm';
 
 requires 'Any::Moose'     => 0.13;
-requires 'Text::Xslate'   => 0.1047;
+requires 'Text::Xslate'   => 0.1048;
 requires 'Plack'          => 0.9938; # Plack::Request
 
 requires 'Config::Tiny'   => 2.12;
