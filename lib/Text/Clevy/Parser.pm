@@ -357,3 +357,10 @@ sub _not_implemented {
 
 no Any::Moose;
 1;
+__END__
+
+=head1 NAME
+
+Text::Clevy::Parser - The Clevy parser
+
+=cut
