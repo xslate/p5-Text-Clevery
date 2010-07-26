@@ -4,7 +4,7 @@ use 5.008_001;
 use strict;
 use warnings;
 
-our $VERSION = '0.0001_01';
+our $VERSION = '0.0001_02';
 
 sub smarty_compatible_version { '2.6' }
 
@@ -102,7 +102,7 @@ Text::Clevy - Smarty compatible template engine on Xslate
 
 =head1 VERSION
 
-This document describes Text::Clevy version 0.0001_01.
+This document describes Text::Clevy version 0.0001_02.
 
 =head1 SYNOPSIS
 
