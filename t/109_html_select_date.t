@@ -5,14 +5,16 @@ use Test::More;
 
 my $now;
 BEGIN{
-    require Time::Piece;
     require POSIX;
     POSIX::setlocale(POSIX::LC_ALL(), 'C');
+    $ENV{TZ} = 'JST-9';
+    POSIX::tzset();
+    note(join ' ', POSIX::tzname());
 
-    $now = Time::Piece->strptime(
-        '2010-7-18 13:12:34',
-        '%Y-%m-%d %H:%M:%S'
-    )->epoch;
+    require Time::Local;
+    # 2010-7-18 08:12:34
+    $now = Time::Local::timegm(34, 12, 8, 18, 6, 2010)
+            - (60 * 60 * 9); # JST-9 for testing
     *CORE::GLOBAL::time = sub { $now }; # mock
 }
 use Text::Clevy;

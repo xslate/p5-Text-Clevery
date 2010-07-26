@@ -5,11 +5,15 @@ use Test::More;
 
 my $now;
 BEGIN{
-    require Time::Local;
     require POSIX;
     POSIX::setlocale(POSIX::LC_ALL(), 'C');
-    # $sec, $min, $hour, $mday, $month, $year
-    $now = Time::Local::timegm(34, 12, 8, 18, 7, 2010)
+    $ENV{TZ} = 'JST-9';
+    POSIX::tzset();
+    note(join ' ', POSIX::tzname());
+
+    require Time::Local;
+    # 2010-7-18 08:12:34
+    $now = Time::Local::timegm(34, 12, 8, 18, 6, 2010)
             - (60 * 60 * 9); # JST-9 for testing
     *CORE::GLOBAL::time = sub { $now }; # mock
 }
