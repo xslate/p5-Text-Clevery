@@ -7,13 +7,12 @@ use Module::Install::Repository;
 all_from 'lib/Text/Clevy.pm';
 
 requires 'Any::Moose'     => 0.13;
-requires 'Text::Xslate'   => 0.1048;
+requires 'Text::Xslate'   => 0.1053;
 requires 'Plack'          => 0.9938; # Plack::Request
 
 requires 'Config::Tiny'   => 2.12;
 requires 'Image::Size'    => 3.22;
 requires 'HTML::Entities' => 1.35;
-requires 'URI::Escape'    => 3.30;
 requires 'Time::Piece'    => 1.20;
 
 test_requires 'Test::More' => 0.88; # done_testing()

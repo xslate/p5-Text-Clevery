@@ -65,6 +65,15 @@ T
     %27Stiff%20Opposition%20Expected%20to%20Casketless%20Funeral%20Plan%27
     \'Stiff Opposition Expected to Casketless Funeral Plan\'
 X
+# ' <- this apos is for poor editors
+
+    [<<'T', {value => q{foo bar/baz} }, <<'X'],
+    {$value|escape:'url'}
+    {$value|escape:'urlpathinfo'}
+T
+    foo%20bar%2Fbaz
+    foo%20bar/baz
+X
 
     [<<'T', {value => q{smarty@example.com} }, <<'X'],
     { $value | escape:"hex" }

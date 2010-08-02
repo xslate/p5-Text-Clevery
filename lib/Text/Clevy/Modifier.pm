@@ -6,7 +6,12 @@ use parent qw(Text::Xslate::Bridge);
 
 use List::Util qw(min);
 
-use Text::Xslate::Util qw(p html_escape mark_raw);
+use Text::Xslate::Util qw(
+    p
+    mark_raw
+    html_escape
+    uri_escape
+);
 
 use Text::Clevy::Util qw(
     safe_join
@@ -95,6 +100,7 @@ sub default {
 }
 
 # See smarty3/libs/plugins/modifier.escape.php
+
 sub escape {
     my($str, $format, $encoding) = @_;
     $format   ||= 'html';
@@ -107,12 +113,9 @@ sub escape {
         require HTML::Entities;
         $str = HTML::Entities::encode($str);
     }
-    elsif($format eq 'url' or $format eq 'urlpathinfo') {
-        require URI::Escape;
-        $str = utf8::is_utf8($str)
-            ? URI::Escape::uri_escape_utf8($str)
-            : URI::Escape::uri_escape($str);
-        if($format eq 'urlpathinfo') {
+    elsif($format =~ /\A ur [il] ( pathinfo )? \z/xms) {
+        $str = uri_escape($str);
+        if($1) { # ur[il]pathinfo
             $str =~ s{%2F}{/}g;
         }
     }
