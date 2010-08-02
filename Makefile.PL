@@ -14,7 +14,7 @@ requires 'Config::Tiny'   => 2.12;
 requires 'Image::Size'    => 3.22;
 requires 'HTML::Entities' => 1.35;
 requires 'URI::Escape'    => 3.30;
-requires 'Time::Piece'    => 1.12;
+requires 'Time::Piece'    => 1.20;
 
 test_requires 'Test::More' => 0.88; # done_testing()
 

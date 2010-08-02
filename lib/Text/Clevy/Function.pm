@@ -557,7 +557,7 @@ sub html_select_date {
         display_years      => \my $display_years,      $Bool, false, true,
 
         month_format       => \my $month_format,       $Str,  false, '%B',   # for strftime
-        month_value_format => \my $month_value_format, $Str,  false, '%m',  # for strftime
+        month_value_format => \my $month_value_format, $Str,  false, '%m',   # for strftime
         day_format         => \my $day_format,         $Str,  false, '%02d', # for sprintf
         day_value_format   => \my $day_value_format,   $Str,  false, '%d',   # for sprintf
 
