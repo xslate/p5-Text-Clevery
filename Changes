@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::Clevy
 
+0.0001_03 Mon Aug  2 14:01:54 2010
+    - Update dependencies
+
 0.0001_02 Mon Jul 26 17:49:35 2010
     - Catch up to Xslate 0.1048
     - Fix timezone problems in tests
