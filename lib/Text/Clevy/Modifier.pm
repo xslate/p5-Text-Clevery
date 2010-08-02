@@ -2,6 +2,8 @@ package Text::Clevy::Modifier;
 use strict;
 use warnings;
 
+use parent qw(Text::Xslate::Bridge);
+
 use List::Util qw(min);
 
 use Text::Xslate::Util qw(p html_escape mark_raw);
@@ -15,7 +17,7 @@ use Text::Clevy::Util qw(
 require Text::Clevy;
 our $EngineClass = 'Text::Clevy';
 
-my @modifiers = map { $_ => __PACKAGE__->can($_) || die $_ } qw(
+my %modifier = map { $_ => __PACKAGE__->can($_) || die $_ } qw(
     capitalize
     cat
     count_characters
@@ -38,8 +40,7 @@ my @modifiers = map { $_ => __PACKAGE__->can($_) || die $_ } qw(
     upper
     wordwrap
 );
-
-sub get_table { @modifiers }
+__PACKAGE__->bridge(function => \%modifier);
 
 sub capitalize {
     my($str, $number_as_word) = @_;
