@@ -129,7 +129,8 @@ This document describes Text::Clevy version 0.0001_02.
 Text::Clevy is a Smarty compatible template engine implemented
 on Xslate.
 
-This software is under development.
+This software is under development. Feel free to send any feature requests and/or
+bug reports.
 
 =head1 INTERFACE
 

@@ -363,4 +363,8 @@ __END__
 
 Text::Clevy::Parser - The Clevy parser
 
+=head1 SEE ALSO
+
+L<Text::Clevy>
+
 =cut

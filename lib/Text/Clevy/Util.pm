@@ -66,4 +66,8 @@ __END__
 
 Text::Clevy::Util - Utilities for Text::Clevy
 
+=head1 SEE ALSO
+
+L<Text::Clevy>
+
 =cut

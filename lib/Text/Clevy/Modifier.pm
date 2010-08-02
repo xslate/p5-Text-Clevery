@@ -121,7 +121,7 @@ sub escape {
     }
     elsif($format eq 'quotes') {
         # escapes single quotes and back slashes
-        $str =~ s{ ( [\\'] ) }{\\$1}xmsg;
+        $str =~ s{ ( [\\'] ) }{\\$1}xmsg; # '
     }
     elsif($format eq 'hex') {
         use bytes;
@@ -331,6 +331,10 @@ Text::Clevy::Modifier - Smarty compatible expression modifiers
 =head2 upper
 
 =head2 wordwrap
+
+=head1 SEE ALSO
+
+L<Text::Clevy>
 
 =cut
 
