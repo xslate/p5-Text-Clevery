@@ -145,6 +145,32 @@ __END__
 
 Text::Clevy::Context - Per-request context object
 
+=head1
+
+This class represents the C<$smarty> variable, a per-request context object.
+
+=head1 METHODS
+
+=head2 C<< $smarty->get($name) >>
+
+=head2 C<< $smarty->post($name) >>
+
+=head2 C<< $smarty->config >>
+
+=head2 C<< $smarty->template >>
+
+=head2 C<< $smarty->ldelim >>
+
+=head2 C<< $smarty->rdelim >>
+
+=head2 C<< $smarty->now >>
+
+=head2 C<< $smarty->version >>
+
+=head2 C<< $smarty->server >>
+
+=head2
+
 =head1 SEE ALSO
 
 L<Text::Clevy>

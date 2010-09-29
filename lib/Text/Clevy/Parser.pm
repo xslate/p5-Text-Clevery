@@ -361,7 +361,7 @@ __END__
 
 =head1 NAME
 
-Text::Clevy::Parser - The Clevy parser
+Text::Clevy::Parser - A Smarty compatible syntax parser
 
 =head1 SEE ALSO
 

@@ -114,23 +114,22 @@ This document describes Text::Clevy version 0.0001_03.
         lang => 'Smarty',
     );
 
-    # pass a PSGI request as 'env'
+    # pass a PSGI request
     my $psgi_env = {};
     print $tc->render_string('Hello, {$lang} world!',
         \%vars, env => $psgi_env);
 
-    # or pass a request object as 'request'
+    # or pass a request object
     my $request = Plack::Request->new($psgi_env);
     print $tc->render_string('Hello, {$lang} world',
         \%vars, request => $request);
 
 =head1 DESCRIPTION
 
-Text::Clevy is a Smarty compatible template engine implemented
-on Xslate.
+Text::Clevy is a Smarty compatible template engine implemented on Xslate.
 
-This software is under development. Feel free to send any feature requests and/or
-bug reports.
+This software is under development.
+Feel free to send any feature requests and/or bug reports.
 
 =head1 INTERFACE
 
@@ -220,11 +219,11 @@ L<http://www.smarty.net/>
 
 =head1 AUTHOR
 
-Goro Fuji (gfx) E<lt>gfuji(at)cpan.orgE<gt>
+Fuji, Goro (gfx) E<lt>gfuji(at)cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2010, Goro Fuji (gfx). All rights reserved.
+Copyright (c) 2010, Fuji, Goro (gfx). All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. See L<perlartistic> for details.
