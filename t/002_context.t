@@ -9,7 +9,7 @@ BEGIN{
     *CORE::GLOBAL::time = sub { $now }; # mock
 }
 
-use Text::Clevy;
+use Text::Clevery;
 use Text::Xslate::Util qw(html_escape);
 
 
@@ -19,7 +19,7 @@ my %env = (
     QUERY_STRING  => 'foo=bar;bar=baz;lang=Xslate',
     SERVER_NAME   => 'my.host',
 );
-my $tc = Text::Clevy->new(verbose => 2);
+my $tc = Text::Clevery->new(verbose => 2);
 
 my @set = (
     [<<'T', {}, sprintf(<<'X', html_escape($env{QUERY_STRING}))],
@@ -111,21 +111,21 @@ for my $d(@set) {
         or do { ($@ && diag $@); diag $source };
 }
 
-$tc = Text::Clevy->new(
+$tc = Text::Clevery->new(
     tag_start => '<!--{',
     tag_end   => '}-->',
 );
 
 is $tc->render_string(<<'T'), <<'X';
-Hello, <!--{ "Clevy" }--> world!
+Hello, <!--{ "Clevery" }--> world!
 T
-Hello, Clevy world!
+Hello, Clevery world!
 X
 
 is $tc->render_string(<<'T'), <<'X';
-Hello, <!--{ $clevy.ldelim }-->Clevy<!--{ $clevy.rdelim }--> world!
+Hello, <!--{ $clevery.ldelim }-->Clevery<!--{ $clevery.rdelim }--> world!
 T
-Hello, &lt;!--{Clevy}--&gt; world!
+Hello, &lt;!--{Clevery}--&gt; world!
 X
 
 done_testing;

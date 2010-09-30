@@ -1,4 +1,4 @@
-package Text::Clevy::Parser;
+package Text::Clevery::Parser;
 use Any::Moose;
 extends 'Text::Xslate::Parser';
 
@@ -23,7 +23,7 @@ around trim_code => sub {
 
     # config variable
     $code =~ s{ \# \s* (\S+) \s* \# }
-              { '$clevy.config.' . $1 }xmsgeo;
+              { '$clevery.config.' . $1 }xmsgeo;
 
     return $parser->$super($code);
 };
@@ -81,8 +81,8 @@ sub init_symbols {
     $parser->make_alias('.' => '->');
 
     # special variables
-    $parser->symbol('$clevy') ->set_nud(\&nud_clevy_context);
-    $parser->symbol('$smarty')->set_nud(\&nud_clevy_context);
+    $parser->symbol('$clevery') ->set_nud(\&nud_clevery_context);
+    $parser->symbol('$smarty')->set_nud(\&nud_clevery_context);
 
     $parser->define_literal(ldelim => $parser->tag_start);
     $parser->define_literal(rdelim => $parser->tag_end);
@@ -109,9 +109,9 @@ sub nud_backquote { # the same as parens
     return $expr;
 }
 
-sub nud_clevy_context {
+sub nud_clevery_context {
     my($parser, $symbol) = @_;
-    return $parser->call('@clevy_context');
+    return $parser->call('@clevery_context');
 }
 
 around nud_literal => sub {
@@ -119,7 +119,7 @@ around nud_literal => sub {
 
     my $value = $symbol->value;
     if(defined($value) and !Scalar::Util::looks_like_number($value)) {
-        # XXX: string literals in Clevy are "raw" string
+        # XXX: string literals in Clevery are "raw" string
         return $parser->call('mark_raw', $parser->$super($symbol));
     }
 
@@ -269,7 +269,7 @@ sub std_foreach {
     # set_foreach_property(name, $~iter.index, $~iter.body)
     if($name) {
         unshift @{$body}, $parser->call(
-            '@clevy_set_foreach_property',
+            '@clevery_set_foreach_property',
             $name,
             $iterator,
             $parser->iterator_body($iterator),
@@ -298,7 +298,7 @@ sub std_foreach {
         $for->first($tmpname);
 
         my $array_is_not_empty = $parser->call(
-            '@clevy_array_is_not_empty', $tmpinit);
+            '@clevery_array_is_not_empty', $tmpinit);
 
         my $if = $symbol->clone(
             arity  => 'if',
@@ -351,7 +351,7 @@ sub std_include {
 
 sub _not_implemented {
     my($self, $proto, $name) = @_;
-    return $self->call('@clevy_not_implemented',
+    return $self->call('@clevery_not_implemented',
         $proto->clone(arity => 'literal', value => $name));
 }
 
@@ -361,10 +361,10 @@ __END__
 
 =head1 NAME
 
-Text::Clevy::Parser - A Smarty compatible syntax parser
+Text::Clevery::Parser - A Smarty compatible syntax parser
 
 =head1 SEE ALSO
 
-L<Text::Clevy>
+L<Text::Clevery>
 
 =cut

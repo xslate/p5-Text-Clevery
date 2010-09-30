@@ -1,4 +1,4 @@
-package Text::Clevy::Function;
+package Text::Clevery::Function;
 use strict;
 use warnings;
 
@@ -18,7 +18,7 @@ use Text::Xslate::Util qw(
     $STRING
 );
 
-use Text::Clevy::Util qw(
+use Text::Clevery::Util qw(
     safe_join safe_cat
     make_tag
     true false
@@ -32,8 +32,8 @@ my $Array      = subtype __PACKAGE__ . '.Array', as 'ArrayRef';
 my $ListLike   = subtype __PACKAGE__ . '.List',  as "$Array|$Str";
 my $AssocArray = subtype __PACKAGE__ . '.AssocArray', as 'ArrayRef|HashRef';
 
-require Text::Clevy;
-our $EngineClass = 'Text::Clevy';
+require Text::Clevery;
+our $EngineClass = 'Text::Clevery';
 
 # Implemented as statements:
 # {capture}, {foreach}, {literal}, {section}, {strip}
@@ -889,7 +889,7 @@ __END__
 
 =head1 NAME
 
-Text::Clevy::Function - Smarty compatible template functions
+Text::Clevery::Function - Smarty compatible template functions
 
 =head1 FUNCTION
 
@@ -935,6 +935,6 @@ Not supported.
 
 =head1 SEE ALSO
 
-L<Text::Clevy>
+L<Text::Clevery>
 
 =cut

@@ -17,10 +17,10 @@ BEGIN{
             - (60 * 60 * 9); # JST-9 for testing
     *CORE::GLOBAL::time = sub { $now }; # mock
 }
-use Text::Clevy;
-use Text::Clevy::Parser;
+use Text::Clevery;
+use Text::Clevery::Parser;
 
-my $tc = Text::Clevy->new(verbose => 2);
+my $tc = Text::Clevery->new(verbose => 2);
 
 my @set = (
     [<<'T', <<'X'],

@@ -1,4 +1,4 @@
-package Text::Clevy::Modifier;
+package Text::Clevery::Modifier;
 use strict;
 use warnings;
 
@@ -13,14 +13,14 @@ use Text::Xslate::Util qw(
     uri_escape
 );
 
-use Text::Clevy::Util qw(
+use Text::Clevery::Util qw(
     safe_join
     safe_cat
     true false
 );
 
-require Text::Clevy;
-our $EngineClass = 'Text::Clevy';
+require Text::Clevery;
+our $EngineClass = 'Text::Clevery';
 
 my %modifier = map { $_ => __PACKAGE__->can($_) || die $_ } qw(
     capitalize
@@ -286,7 +286,7 @@ __END__
 
 =head1 NAME
 
-Text::Clevy::Modifier - Smarty compatible expression modifiers
+Text::Clevery::Modifier - Smarty compatible expression modifiers
 
 =head1 MODIFIER
 
@@ -334,7 +334,7 @@ Text::Clevy::Modifier - Smarty compatible expression modifiers
 
 =head1 SEE ALSO
 
-L<Text::Clevy>
+L<Text::Clevery>
 
 =cut
 

@@ -1,4 +1,4 @@
-package Text::Clevy;
+package Text::Clevery;
 
 use 5.008_001;
 use strict;
@@ -13,17 +13,17 @@ use parent qw(Text::Xslate);
 use Carp ();
 
 use Text::Xslate::Util qw(p);
-use Text::Clevy::Context;
-use Text::Clevy::Function;
-use Text::Clevy::Modifier;
+use Text::Clevery::Context;
+use Text::Clevery::Function;
+use Text::Clevery::Modifier;
 
 my %builtin = (
-    '@clevy_context'              => \&get_current_context,
-    '@clevy_set_foreach_property' => \&_set_foreach_property,
-    '@clevy_array_is_not_empty'   => \&_array_is_not_empty,
-    '@clevy_not_implemented'      => \&_not_implemented,
-    Text::Clevy::Function->methods(),
-    Text::Clevy::Modifier->methods(),
+    '@clevery_context'              => \&get_current_context,
+    '@clevery_set_foreach_property' => \&_set_foreach_property,
+    '@clevery_array_is_not_empty'   => \&_array_is_not_empty,
+    '@clevery_not_implemented'      => \&_not_implemented,
+    Text::Clevery::Function->methods(),
+    Text::Clevery::Modifier->methods(),
 );
 
 sub default_functions { \%builtin }
@@ -33,7 +33,7 @@ sub options {
 
     my $opts = $self->SUPER::options;
 
-    $opts->{syntax} = 'Text::Clevy::Parser';
+    $opts->{syntax} = 'Text::Clevery::Parser';
 
     # set delimiters here to make access easier
     $opts->{tag_start} = '{';
@@ -44,24 +44,24 @@ sub options {
 sub render_string {
     my($self, $str, $vars, @args) = @_;
 
-    local $self->{clevy_context_args} = \@args;
-    local $self->{clevy_context};
+    local $self->{clevery_context_args} = \@args;
+    local $self->{clevery_context};
     return $self->SUPER::render_string($str, $vars);
 }
 
 sub render {
     my($self, $str, $vars, @args) = @_;
 
-    local $self->{clevy_context_args} = \@args;
-    local $self->{clevy_context};
+    local $self->{clevery_context_args} = \@args;
+    local $self->{clevery_context};
     return $self->SUPER::render($str, $vars);
 }
 
 sub get_current_context {
     my $self = __PACKAGE__->current_engine()
-        or Carp::confess("Cannot get clevy context outside render()");
-    return $self->{clevy_context} ||= Text::Clevy::Context->new(
-            @{$self->{clevy_context_args}},
+        or Carp::confess("Cannot get clevery context outside render()");
+    return $self->{clevery_context} ||= Text::Clevery::Context->new(
+            @{$self->{clevery_context_args}},
             _engine => $self,
         );
 }
@@ -98,17 +98,17 @@ __END__
 
 =head1 NAME
 
-Text::Clevy - Smarty compatible template engine on Xslate
+Text::Clevery - Smarty compatible template engine on Xslate
 
 =head1 VERSION
 
-This document describes Text::Clevy version 0.0002.
+This document describes Text::Clevery version 0.0002.
 
 =head1 SYNOPSIS
 
-    use Text::Clevy;
+    use Text::Clevery;
 
-    my $tc = Text::Clevy->new();
+    my $tc = Text::Clevery->new();
 
     my %vars = (
         lang => 'Smarty',
@@ -126,7 +126,7 @@ This document describes Text::Clevy version 0.0002.
 
 =head1 DESCRIPTION
 
-Text::Clevy is a Smarty compatible template engine implemented on Xslate.
+Text::Clevery is a Smarty compatible template engine implemented on Xslate.
 
 This software is under development.
 Feel free to send any feature requests and/or bug reports.

@@ -15,7 +15,7 @@ all_pod_files_spelling_ok('lib');
 __DATA__
 Goro Fuji (gfx)
 gfuji(at)cpan.org
-Text::Clevy
+Text::Clevery
 gfx
 cpan
 xslate
@@ -26,3 +26,6 @@ br
 nl
 spacify
 wordwrap
+RT
+XS
+Smarty

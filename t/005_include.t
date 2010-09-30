@@ -3,8 +3,8 @@
 use strict;
 use Test::More;
 
-use Text::Clevy;
-use Text::Clevy::Parser;
+use Text::Clevery;
+use Text::Clevery::Parser;
 
 my %vpath = (
     foo => <<'T',
@@ -19,7 +19,7 @@ T
 
 );
 
-my $tc = Text::Clevy->new(
+my $tc = Text::Clevery->new(
     verbose => 2,
     cache   => 0,
     path    => [\%vpath, 't/template'],
@@ -27,21 +27,21 @@ my $tc = Text::Clevy->new(
 
 
 my @set = (
-    [<<'T', {lang => 'Clevy'}, <<'X'],
+    [<<'T', {lang => 'Clevery'}, <<'X'],
 {include file="foo" -}
 T
-Hello, Clevy world!
+Hello, Clevery world!
 X
 
-    [<<'T', {lang => 'Clevy'}, <<'X'],
+    [<<'T', {lang => 'Clevery'}, <<'X'],
 {include file="bar" -}
 T
 ----
-Hello, Clevy world!
+Hello, Clevery world!
 ----
 X
 
-    [<<'T', {lang => 'Clevy'}, <<'X'],
+    [<<'T', {lang => 'Clevery'}, <<'X'],
 {include file="bar" lang="Smarty" -}
 T
 ----

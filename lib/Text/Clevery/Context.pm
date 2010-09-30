@@ -1,4 +1,4 @@
-package Text::Clevy::Context;
+package Text::Clevery::Context;
 use Any::Moose;
 
 has _engine => (
@@ -130,7 +130,7 @@ sub rdelim {
 
 sub server { shift()->env }
 
-sub version { Text::Clevy->smarty_compatible_version }
+sub version { Text::Clevery->smarty_compatible_version }
 
 sub now { time }
 
@@ -143,7 +143,7 @@ __END__
 
 =head1 NAME
 
-Text::Clevy::Context - Per-request context object
+Text::Clevery::Context - Per-request context object
 
 =head1
 
@@ -173,7 +173,7 @@ This class represents the C<$smarty> variable, a per-request context object.
 
 =head1 SEE ALSO
 
-L<Text::Clevy>
+L<Text::Clevery>
 
 =cut
 

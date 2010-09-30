@@ -1,4 +1,4 @@
-package Text::Clevy::Util;
+package Text::Clevery::Util;
 use strict;
 use warnings;
 
@@ -64,10 +64,10 @@ __END__
 
 =head1 NAME
 
-Text::Clevy::Util - Utilities for Text::Clevy
+Text::Clevery::Util - Utilities for Text::Clevery
 
 =head1 SEE ALSO
 
-L<Text::Clevy>
+L<Text::Clevery>
 
 =cut

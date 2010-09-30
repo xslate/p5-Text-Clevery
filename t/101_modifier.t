@@ -3,13 +3,13 @@
 use strict;
 use Test::More;
 
-use Text::Clevy;
-use Text::Clevy::Parser;
+use Text::Clevery;
+use Text::Clevery::Parser;
 use Time::Piece ();
 
 my $now = time();
 
-my $tc = Text::Clevy->new(verbose => 2);
+my $tc = Text::Clevery->new(verbose => 2);
 
 my @set = (
     [<<'T', {value => "next x-men film, x3, delayed."}, <<'X', 'filter'],

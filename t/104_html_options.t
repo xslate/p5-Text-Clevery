@@ -3,10 +3,10 @@
 use strict;
 use Test::More;
 
-use Text::Clevy;
-use Text::Clevy::Parser;
+use Text::Clevery;
+use Text::Clevery::Parser;
 
-my $tc = Text::Clevy->new(verbose => 2);
+my $tc = Text::Clevery->new(verbose => 2);
 
 my @set = (
     [<<'T', { opts => [ [1800, 'Joe'], [9904, 'Jack'] ], sel => 9904  }, <<'X'],

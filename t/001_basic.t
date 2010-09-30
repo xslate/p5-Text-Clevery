@@ -3,38 +3,38 @@
 use strict;
 use Test::More;
 
-use Text::Clevy;
-use Text::Clevy::Parser;
-use Text::Clevy::Util qw(ceil floor);
+use Text::Clevery;
+use Text::Clevery::Parser;
+use Text::Clevery::Util qw(ceil floor);
 use Time::Piece ();
 
 my $now = Time::Piece->new();
 
-my $tc = Text::Clevy->new(verbose => 2);
+my $tc = Text::Clevery->new(verbose => 2);
 
 my @set = (
-    [<<'T', {lang => 'Clevy'}, <<'X'],
+    [<<'T', {lang => 'Clevery'}, <<'X'],
 Hello, {$lang} world!
 T
-Hello, Clevy world!
+Hello, Clevery world!
 X
 
-    [<<'T', {h => { lang => 'Clevy' }}, <<'X'],
+    [<<'T', {h => { lang => 'Clevery' }}, <<'X'],
 Hello, {$h.lang} world!
 T
-Hello, Clevy world!
+Hello, Clevery world!
 X
 
-    [<<'T', {h => { lang => 'Clevy' }, f => 'lang' }, <<'X'],
+    [<<'T', {h => { lang => 'Clevery' }, f => 'lang' }, <<'X'],
 Hello, {$h.$f} world!
 T
-Hello, Clevy world!
+Hello, Clevery world!
 X
 
-    [<<'T', {a => ['Clevy'] }, <<'X'],
+    [<<'T', {a => ['Clevery'] }, <<'X'],
 Hello, {$a[0]} world!
 T
-Hello, Clevy world!
+Hello, Clevery world!
 X
 
     [<<'T', { x => 32 }, <<'X'],
@@ -59,27 +59,27 @@ T
 { $now->year() -}
 T
 
-    [<<'T', {lang => 'Clevy' }, <<'X'],
+    [<<'T', {lang => 'Clevery' }, <<'X'],
 Hello, {ldelim}{$lang}{rdelim} world!
 T
-Hello, {Clevy} world!
+Hello, {Clevery} world!
 X
 
-    [<<'T', {lang => 'Clevy'}, <<'X'],
+    [<<'T', {lang => 'Clevery'}, <<'X'],
 Hello, {* this is a comment *}{$lang}{* this is another comment *} world!
 T
-Hello, Clevy world!
+Hello, Clevery world!
 X
 
-    [<<'T', {lang => 'Clevy'}, <<'X'],
+    [<<'T', {lang => 'Clevery'}, <<'X'],
 Hello, {$lang} world!{* comment
  comment
  comment *}
 T
-Hello, Clevy world!
+Hello, Clevery world!
 X
 
-    [<<'T', {lang => 'Clevy'}, <<'X'],
+    [<<'T', {lang => 'Clevery'}, <<'X'],
     ---
 {if $lang}
     ok
@@ -93,7 +93,7 @@ T
     ---
 X
 
-    [<<'T', {lang => 'Clevy'}, <<'X'],
+    [<<'T', {lang => 'Clevery'}, <<'X'],
     ---
 {if $lang}
     ok
