@@ -1,15 +1,19 @@
 #!perl -w
-
 use strict;
 use Test::More;
 
 my $now;
 BEGIN{
-    require POSIX;
-    POSIX::setlocale(POSIX::LC_ALL(), 'C');
-    $ENV{TZ} = 'JST-9';
-    POSIX::tzset();
-    note(join ' ', POSIX::tzname());
+    eval {
+        require POSIX;
+        POSIX::setlocale(POSIX::LC_ALL(), 'C');
+        $ENV{TZ} = 'JST-9';
+        POSIX::tzset();
+        note(join ' ', POSIX::tzname());
+    };
+    if($@) {
+        plan skip_all => "Failed to tzset ($@)";
+    }
 
     require Time::Local;
     # 2010-7-18 08:12:34
