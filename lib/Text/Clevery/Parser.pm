@@ -190,10 +190,7 @@ sub std_name { # simple names are assumed as commands
     my($parser, $symbol) = @_;
 
     my @args = $parser->attr_list();
-    return $parser->symbol('print')->clone(
-        arity => 'command',
-        first => [$parser->call($symbol, @args)],
-    );
+    return $parser->print( $parser->call($symbol, @args) );
 }
 
 sub define_function {
@@ -323,10 +320,6 @@ sub std_foreach {
 sub std_include {
     my($parser, $symbol) = @_;
 
-    my $include = $symbol->clone(
-        arity => 'command',
-    );
-
     my @args = $parser->attr_list();
 
     my $file;
@@ -343,8 +336,8 @@ sub std_include {
     }
 
     return $symbol->clone(
-        arity  => 'command',
-        first  => [ $file ],
+        arity  => 'include',
+        first  => $file,
         second => \@args,
     );
 }
