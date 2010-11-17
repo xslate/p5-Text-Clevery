@@ -4,7 +4,7 @@ use 5.008_001;
 use strict;
 use warnings;
 
-our $VERSION = '0.0003';
+our $VERSION = '0.0004';
 
 sub smarty_compatible_version { '2.6' }
 
@@ -102,7 +102,7 @@ Text::Clevery - Smarty compatible template engine on Xslate
 
 =head1 VERSION
 
-This document describes Text::Clevery version 0.0003.
+This document describes Text::Clevery version 0.0004.
 
 =head1 SYNOPSIS
 

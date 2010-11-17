@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::Clevy
 
+0.0004 2010-11-17 22:31:36
+    - Changes for Xslate 0.2015
+
 0.0003 Thu Sep 30 11:58:08 2010
     - Rename the name Clevy to Clevery, to remind Smarty more easily
       (thanks to miyagawa)
