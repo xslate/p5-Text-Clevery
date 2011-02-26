@@ -201,6 +201,12 @@ C<< {textformat} >>
 
 =back
 
+=head1 COMMAND LINE INTERFACE
+
+You can use C<xslate(1)> for Clevery by the C<--engine> (or -E) option:
+
+    xslate -E Text::Clevery -e '...'
+
 =head1 DEPENDENCIES
 
 Perl 5.8.1 or later.
