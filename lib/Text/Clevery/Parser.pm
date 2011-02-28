@@ -115,6 +115,17 @@ sub nud_clevery_context {
     return $parser->call('@clevery_context');
 }
 
+around nud_literal => sub {
+    my($super, $parser, $symbol) = @_;
+
+    my $value = $symbol->value;
+    if(defined($value) and !Scalar::Util::looks_like_number($value)) {
+        # XXX: string literals in Clevery are "raw" string
+        return $parser->call('mark_raw', $parser->$super($symbol));
+    }
+
+    return $parser->$super($symbol);
+};
 
 around led_dot => sub {
     my($super, $parser, $symbol, $left) = @_;
