@@ -208,6 +208,21 @@ All complex software has bugs lurking in it, and this module is no
 exception. If you find a bug please either email me, or add the bug
 to cpan-RT.
 
+=head1 SUPPORT
+
+IRC
+
+  Join #xslate on irc.perl.org.
+
+Repository
+
+  https://github.com/gfx/p5-Text-Clevery
+  Pull request and additional contributors are welcome
+ 
+Issue Tracker
+
+  https://github.com/gfx/p5-Text-Clevery/issues
+
 =head1 SEE ALSO
 
 L<Text::Xslate>
