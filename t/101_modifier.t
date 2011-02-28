@@ -24,7 +24,7 @@ X
 
     [<<'T', {value => "foo"}, <<'X'],
     <em>{$value|cat:"bar"}</em>
-    {$value|cat: "<br />"}
+    {$value|cat: raw("<br />")}
 T
     <em>foobar</em>
     foo<br />
@@ -213,7 +213,7 @@ X
 
 {$value|wordwrap:20}
 
-{$value|wordwrap:30:"<br />\n"}
+{$value|wordwrap:30:raw("<br />\n")}
 
 {$value|wordwrap:26:"\n":true}
 T
