@@ -1,10 +1,9 @@
 package Text::Clevery;
+# ABSTRACT: Smarty compatible template engine on Xslate
 
 use 5.008_001;
 use strict;
 use warnings;
-
-our $VERSION = '0.0004';
 
 sub smarty_compatible_version { '2.6' }
 
@@ -95,14 +94,6 @@ sub _not_implemented {
 
 1;
 __END__
-
-=head1 NAME
-
-Text::Clevery - Smarty compatible template engine on Xslate
-
-=head1 VERSION
-
-This document describes Text::Clevery version 0.0004.
 
 =head1 SYNOPSIS
 
@@ -222,16 +213,5 @@ to cpan-RT.
 L<Text::Xslate>
 
 L<http://www.smarty.net/>
-
-=head1 AUTHOR
-
-Fuji, Goro (gfx) E<lt>gfuji(at)cpan.orgE<gt>
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright (c) 2010, Fuji, Goro (gfx). All rights reserved.
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. See L<perlartistic> for details.
 
 =cut

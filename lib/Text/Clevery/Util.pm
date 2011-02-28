@@ -1,4 +1,5 @@
 package Text::Clevery::Util;
+# ABSTRACT: Utilities for Text::Clevery
 use strict;
 use warnings;
 
@@ -61,10 +62,6 @@ sub ceil {
 }
 1;
 __END__
-
-=head1 NAME
-
-Text::Clevery::Util - Utilities for Text::Clevery
 
 =head1 SEE ALSO
 

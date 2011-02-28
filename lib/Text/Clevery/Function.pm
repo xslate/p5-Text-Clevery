@@ -1,4 +1,5 @@
 package Text::Clevery::Function;
+# ABSTRACT: Smarty compatible template functions
 use strict;
 use warnings;
 
@@ -886,10 +887,6 @@ sub html_table {
 no Any::Moose '::Util::TypeConstraints';
 1;
 __END__
-
-=head1 NAME
-
-Text::Clevery::Function - Smarty compatible template functions
 
 =head1 FUNCTION
 

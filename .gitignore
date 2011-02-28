@@ -1,4 +1,4 @@
-Text-Clevy-*
+Text-Clevery-*
 .*
 !.gitignore
 !.shipit
@@ -25,3 +25,4 @@ cover_db*
 *.tplc
 Smarty2/
 Smarty3/
+.build

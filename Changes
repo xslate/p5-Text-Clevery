@@ -1,4 +1,7 @@
-Revision history for Perl extension Text::Clevy
+Revision history for Perl extension Text::Clevery
+
+{{$NEXT}}
+	- Switched to Dist::Zilla (Getty)
 
 0.0004 2010-11-17 22:31:36
     - Changes for Xslate 0.2015

@@ -1,4 +1,5 @@
 package Text::Clevery::Parser;
+# ABSTRACT: A Smarty compatible syntax parser
 use Any::Moose;
 extends 'Text::Xslate::Parser';
 
@@ -351,10 +352,6 @@ sub _not_implemented {
 no Any::Moose;
 1;
 __END__
-
-=head1 NAME
-
-Text::Clevery::Parser - A Smarty compatible syntax parser
 
 =head1 SEE ALSO
 

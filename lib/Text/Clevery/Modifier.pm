@@ -1,4 +1,5 @@
 package Text::Clevery::Modifier;
+# ABSTRACT: Smarty compatible expression modifiers
 use strict;
 use warnings;
 
@@ -283,10 +284,6 @@ sub wordwrap {
 
 1;
 __END__
-
-=head1 NAME
-
-Text::Clevery::Modifier - Smarty compatible expression modifiers
 
 =head1 MODIFIER
 

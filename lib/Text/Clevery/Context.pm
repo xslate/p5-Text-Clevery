@@ -1,4 +1,5 @@
 package Text::Clevery::Context;
+# ABSTRACT: Per-request context object
 use Any::Moose;
 
 has _engine => (
@@ -141,11 +142,7 @@ no Any::Moose;
 __PACKAGE__->meta->make_immutable();
 __END__
 
-=head1 NAME
-
-Text::Clevery::Context - Per-request context object
-
-=head1
+=head1 DESCRIPTION
 
 This class represents the C<$smarty> variable, a per-request context object.
 
