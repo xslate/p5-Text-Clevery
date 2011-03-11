@@ -59,8 +59,8 @@ X
     {$value|escape:'url'}
     {$value|escape:'quotes'}
 T
-    &apos;Stiff Opposition Expected to Casketless Funeral Plan&apos;
-    &apos;Stiff Opposition Expected to Casketless Funeral Plan&apos;
+    &#39;Stiff Opposition Expected to Casketless Funeral Plan&#39;
+    &#39;Stiff Opposition Expected to Casketless Funeral Plan&#39;
     &#39;Stiff Opposition Expected to Casketless Funeral Plan&#39;
     %27Stiff%20Opposition%20Expected%20to%20Casketless%20Funeral%20Plan%27
     \'Stiff Opposition Expected to Casketless Funeral Plan\'
@@ -181,9 +181,9 @@ X
     { $value | strip_tags:true}
     { $value | strip_tags:false}
 T
-    Blind Woman Gets  New Kidney  from Dad she Hasn&apos;t Seen in  years .
-    Blind Woman Gets  New Kidney  from Dad she Hasn&apos;t Seen in  years .
-    Blind Woman Gets New Kidney from Dad she Hasn&apos;t Seen in years.
+    Blind Woman Gets  New Kidney  from Dad she Hasn&#39;t Seen in  years .
+    Blind Woman Gets  New Kidney  from Dad she Hasn&#39;t Seen in  years .
+    Blind Woman Gets New Kidney from Dad she Hasn&#39;t Seen in years.
 X
 
     [<<'T', {value => q{Two Sisters Reunite after Eighteen Years at Checkout Counter.} }, <<'X'],
@@ -217,23 +217,23 @@ X
 
 {$value|wordwrap:26:"\n":true}
 T
-Blind woman gets new kidney from dad she hasn&apos;t seen in years.
+Blind woman gets new kidney from dad she hasn&#39;t seen in years.
 
 Blind woman gets new kidney
-from dad she hasn&apos;t seen in
+from dad she hasn&#39;t seen in
 years.
 
 Blind woman gets new
 kidney from dad she
-hasn&apos;t seen in
+hasn&#39;t seen in
 years.
 
 Blind woman gets new kidney<br />
-from dad she hasn&apos;t seen in<br />
+from dad she hasn&#39;t seen in<br />
 years.
 
 Blind woman gets new kidn
-ey from dad she hasn&apos;t se
+ey from dad she hasn&#39;t se
 en in years.
 X
 
